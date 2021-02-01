@@ -4,11 +4,33 @@ Author: William Wright
 '''
 
 import os
+import re
+import string
 import inspect
 import logging
 
 import boto3
 import progressbar
+
+
+def process_cols_v2(cols):
+    '''docstring for process_cols
+    for processing: remove special characters
+    '''
+    chars = re.escape(string.punctuation)
+    clean = [re.sub(r'[' + chars + ']', '', my_str) for my_str in cols]
+    clean = [i.lower().replace(' ', '_') for i in clean]
+    clean = ['product_code_sku' if 'product_code' in i else i for i in clean]
+    return clean
+
+
+def product_df(filepath):
+    '''product_df docstring
+    return most recent product export from bigcommerce'''
+    df = pd.read_csv(filepath)
+    df.columns = process_cols_v2(df.columns)
+    df = df.loc[df.item_type == 'Product']
+    return df
 
 
 def function_logger(file_level, console_level=None, function_name=None):
@@ -46,12 +68,38 @@ def create_directory(folders, logger=None):
                 print(e)
 
 
-def upload_to_s3(path_output, bucket_name, key_path, logger=None):
+# def upload_to_s3(file_name, bucket_name, object_name, logger=None):
+#     '''upload_to_s3 docstring
+#     file_name: local file (temp file) to be uploaded
+#     bucket_name: S3 project bucket
+#     object_name: key path + file name (combined)
+#     '''
+#     s3 = boto3.client('s3')
+#     path_output = os.path.abspath(file_name)
+#     statinfo = os.stat(path_output)
+#     if logger:
+#         logger.info('uploading file:\t' + file_name)
+#         logger.info('uploading destination:\t' + object_name)
+
+#     up_progress = progressbar.progressbar.ProgressBar(maxval=statinfo.st_size)
+#     up_progress.start()
+
+#     def upload_progress(chunk):
+#         up_progress.update(up_progress.currval + chunk)
+
+#     s3.upload_file(path_output,
+#                    bucket_name,
+#                    object_name,
+#                    Callback=upload_progress)
+#     up_progress.finish()
+
+
+def upload_to_s3(upload_file, bucket_name, key_path, file_name, logger=None):
     '''upload_to_s3 docstring'''
-    file_name = path_output.split('/')[-1]
+    # file_name = path_output.split('/')[-1]
     object_name = key_path + '/' + file_name
     s3 = boto3.client('s3')
-    statinfo = os.stat(path_output)
+    statinfo = os.stat(upload_file)
     if logger:
         logger.info('uploading file:\t' + file_name)
         logger.info('uploading destination:\t' + object_name)
@@ -62,7 +110,7 @@ def upload_to_s3(path_output, bucket_name, key_path, logger=None):
     def upload_progress(chunk):
         up_progress.update(up_progress.currval + chunk)
 
-    s3.upload_file(path_output,
+    s3.upload_file(upload_file,
                    bucket_name,
                    object_name,
                    Callback=upload_progress)
