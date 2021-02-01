@@ -6,13 +6,19 @@ import logging
 import inspect
 import configparser
 
+import pandas as pd
+
 
 class base_api(object):
-    def __init__(self, project_name):
-        self.logger = logging.getLogger(project_name)
+    '''very descriptive docstring'''
+    def __init__(self, project_name=None):
+        if project_name:
+            self.logger = logging.getLogger(project_name)
+        else:
+            self.logger = logging.getLogger('base_api_dev')
         config = configparser.ConfigParser()
         config.read('project.cfg')
-        configs = dict(config.items('bc_api_creds'))
+        configs = dict(config.items('bc_api_read_and_write'))
         self.store_hash = configs['store_hash']
         self.auth_token = configs['x_auth_token']
         self.conn = http.client.HTTPSConnection("api.bigcommerce.com")
@@ -21,24 +27,39 @@ class base_api(object):
             'content-type': "application/json",
             'x-auth-token': self.auth_token
         }
-        self.url = "/stores/" + self.store_hash + "/v3/catalog/{endpoint}{_id}"
+        self.url = "/stores/" + self.store_hash + "/v3/catalog/{endpoint}{attribute}"
 
     def get_prod(self, _id='8485'):
+        '''very descriptive docstring'''
         self.logger.info('get product: ' + _id)
         endpoint = 'products'
-        url = self.url.format(endpoint=endpoint, _id='/' + _id)
+        url = self.url.format(endpoint=endpoint, attribute='/' + _id)
         self.conn.request("GET", url, headers=headers)
         res = self.conn.getresponse().read()
         json_data = json.loads(res.decode("utf-8"))
         return json_data
 
+    def convert_pages_to_df(self, data):
+        '''very descriptive docstring'''
+        self.logger.info('converting paginated json to dataframe')
+        dfs = []
+        for page in data:
+
+            df = pd.DataFrame(data[page]['data'])
+            dfs.append(df)
+        df = pd.concat(dfs)
+        df.reset_index(drop=True,inplace=True)
+        return df
+
     def get_all_prods(self):
+        '''very descriptive docstring'''
         self.logger.info('get all products in catalog')
         data = {}
         flag = True
         page_num = 0
         endpoint = 'products'
-        url = self.url.format(endpoint=endpoint, _id="/?limit=250&page={}")
+        url = self.url.format(endpoint=endpoint,
+                              attribute="/?limit=250&page={}")
         while flag:
             page_num += 1
             self.conn.request("GET",
@@ -48,14 +69,36 @@ class base_api(object):
             try:
                 json_data = json.loads(res.decode("utf-8"))
             except JSONDecodeError as e:
-                self.logger.info(e)
+                self.logger.warning(e)
                 self.logger.info(res)
             data[page_num] = json_data
-            self.logger.info(
-                str(json_data['meta']['pagination']['current_page']) +
-                '\tof\t' + str(json_data['meta']['pagination']['total_pages']))
+            if page_num % 10 == 0:
+                self.logger.info(
+                    'retrieving page ' +
+                    str(json_data['meta']['pagination']['current_page']) +
+                    ' of ' +
+                    str(json_data['meta']['pagination']['total_pages']))
             if json_data['meta']['pagination']['current_page'] == json_data[
                     'meta']['pagination']['total_pages']:
-                self.logger.info(str(flag))
                 flag = False
-        return data
+        self.data = data
+        try:
+            df = self.convert_pages_to_df(self.data)
+        except:
+            self.logger.error(
+                'pages dictionary unable to convert to dataframe, call "data" attribute'
+            )
+        return df
+
+    def put_prod_desc(self, new_html, _id='8485'):
+        '''very descriptive docstring'''
+        self.logger.info('modify product description: ' + str(_id))
+        payload = json.dumps({'description': new_html})
+        url = self.url.format(endpoint='products', attribute='/' + _id)
+        conn.request("PUT", url, payload, headers=self.headers)
+        res = conn.getresponse()
+        if res.code == 200:
+            self.logger.info('response code: ' + str(res.code))
+        else:
+            self.logger.warning('response code: ' + str(res.code) +
+                                ' product id ' + str(_id) + ' unsuccessful')
