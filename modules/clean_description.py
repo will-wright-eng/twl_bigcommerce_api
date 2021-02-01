@@ -3,24 +3,25 @@ Author: William Wright
 '''
 
 import re
-import logging
+
 
 class clean_description(object):
     '''clean_description docstring'''
     def __init__(self, desc, regex_dict, logger=None):
         self.desc = desc
         self.regex_dict = regex_dict
-        if logger:
-            self.logger = logging.getLogger(__name__)
-        else:
-            self.logger = logger
+        self.logger = logger
 
     def clean(self):
         self.d = self.flight_chars_dict()
+        # print('-'*20,'\n\n',self.desc,'\n\n')
         self.desc = self.remove_content()
+        # print('-'*20,'\n\n',self.desc,'\n\n')
         self.desc = self.substitution()
+        # print('-'*20,'\n\n',self.desc,'\n\n')
         if len(self.d) > 0:
             self.desc = self.add_flight_chars(self.d)
+        # print('-'*20,'\n\n',self.desc,'\n\n')
         return self.desc
 
     def flight_chars_dict(self):
@@ -55,12 +56,10 @@ class clean_description(object):
                     ]
                     d = {i: j for i, j in zip(cats, match)}
                 except IndexError as e:
-                    if self.logger:
-                        self.logger.error(
-                            str(e) +
-                            ' - no "Flight Chars" match in product description')
-                    # else:
-                    #     print(e)
+                    pass
+                    self.logger.error(
+                        str(e) +
+                        ' - no "Flight Chars" match in product description')
         return d
 
     def remove_content(self):
@@ -87,11 +86,8 @@ class clean_description(object):
                     self.desc = re.sub(sub1.format(i), sub2.format(j),
                                        self.desc)
                 except re.error as e:
-                    if self.logger:
-                        self.logger.error('sub_pattern')
-                        self.logger.error(e)
-                    # else:
-                    #     print(e)
+                    self.logger.error('sub_pattern')
+                    self.logger.error(e)
 
     def substitution(self):
         '''substitution docstring'''
@@ -125,10 +121,10 @@ class clean_description(object):
         pattern = '<h2>Specifications</h2> <ul> {}<li>Best'
         self.desc = re.sub(pattern.format(''), pattern.format(s3), self.desc)
         if 'Please note: stamp & exact color may vary' in self.desc:
-            if self.logger:
-                self.logger.error(
-                    '"please note" already present, likely this product id was already cleaned'
-                )
+            self.logger.error(
+                '"please note" already present, likely this product id was already cleaned'
+            )
+            pass
         else:
             note = '<li>Please note: stamp & exact color may vary</li></ul>'
             self.desc = re.sub('</ul>', note, self.desc)

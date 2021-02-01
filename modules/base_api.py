@@ -21,7 +21,7 @@ class base_api(object):
         configs = dict(config.items('bc_api_read_and_write'))
         self.store_hash = configs['store_hash']
         self.auth_token = configs['x_auth_token']
-        self.conn = http.client.HTTPSConnection("api.bigcommerce.com")
+        
         self.headers = {
             'accept': "application/json",
             'content-type': "application/json",
@@ -31,13 +31,20 @@ class base_api(object):
 
     def get_prod(self, _id='8485'):
         '''very descriptive docstring'''
-        self.logger.info('get product: ' + _id)
+        self.logger.info('get product: ' + str(_id))
         endpoint = 'products'
-        url = self.url.format(endpoint=endpoint, attribute='/' + _id)
-        self.conn.request("GET", url, headers=headers)
-        res = self.conn.getresponse().read()
-        json_data = json.loads(res.decode("utf-8"))
-        return json_data
+        url = self.url.format(endpoint=endpoint, attribute='/' + str(_id))
+        conn = http.client.HTTPSConnection("api.bigcommerce.com")
+        conn.request("GET", url, headers=self.headers)
+        res = conn.getresponse()
+        if res.code == 200:
+            self.logger.info('response code: ' + str(res.code))
+        else:
+            self.logger.warning('response code: ' + str(res.code) +
+                                ' product id ' + str(_id) + ' unsuccessful')
+        json_data = json.loads(res.read().decode("utf-8"))
+        # print(json_data['data']['description'])
+        return json_data['data']
 
     def convert_pages_to_df(self, data):
         '''very descriptive docstring'''
@@ -59,12 +66,13 @@ class base_api(object):
         endpoint = 'products'
         url = self.url.format(endpoint=endpoint,
                               attribute="/?limit=250&page={}")
+        conn = http.client.HTTPSConnection("api.bigcommerce.com")
         while flag:
             page_num += 1
-            self.conn.request("GET",
+            conn.request("GET",
                               url.format(page_num),
                               headers=self.headers)
-            res = self.conn.getresponse().read()
+            res = conn.getresponse().read()
             try:
                 json_data = json.loads(res.decode("utf-8"))
             except JSONDecodeError as e:
@@ -93,7 +101,9 @@ class base_api(object):
         '''very descriptive docstring'''
         self.logger.info('modify product description: ' + str(_id))
         payload = json.dumps({'description': new_html})
-        url = self.url.format(endpoint='products', attribute='/' + _id)
+        print(payload)
+        url = self.url.format(endpoint='products', attribute='/' + str(_id))
+        conn = http.client.HTTPSConnection("api.bigcommerce.com")
         conn.request("PUT", url, payload, headers=self.headers)
         res = conn.getresponse()
         if res.code == 200:

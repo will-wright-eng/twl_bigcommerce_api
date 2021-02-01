@@ -1,9 +1,15 @@
+# files
 *configs.py
 Untitled.*
 project.cfg
-*.csv
 .DS_Store
+
+# file extensions
+*.csv
+
+# folders
 batches/
+project_dev/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
