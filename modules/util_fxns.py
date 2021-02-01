@@ -10,6 +10,7 @@ import inspect
 import logging
 
 import boto3
+import pandas as pd
 import progressbar
 
 

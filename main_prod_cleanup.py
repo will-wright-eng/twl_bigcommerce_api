@@ -21,22 +21,24 @@ from modules.regex_dict import regex_dict
 from modules.clean_description import clean_description
 
 today = str(dt.date.today())
-project_name = 'prod_backup_script'
+# project_name = 'prod_backup_script'
+project_name = __file__.replace('.py','')
 logger = utilf.function_logger(logging.DEBUG,
                                logging.DEBUG,
                                function_name=project_name)
 
 config = configparser.ConfigParser()
 config.read('project.cfg')
-configs = dict(config.items('s3_info'))
-bucket_name = configs['bucket']
-key_path = configs['prod_desc_records']
+# configs = dict(config.items('s3_info'))
+# bucket_name = configs['bucket']
+# key_path = configs['prod_desc_records']
 
-batch_file = cfg_dict['batch_file']
-imgs_bool = cfg_dict['imgs_bool']
-output_folder_html = cfg_dict['output_folder_html']
-output_folder_combined = cfg_dict['output_folder_combined']
-program_name = cfg_dict['program_name']
+configs = dict(config.items('desc_cleanup'))
+batch_file = configs['batch_file']
+# imgs_bool = cfg_dict['imgs_bool']
+# output_folder_html = cfg_dict['output_folder_html']
+# output_folder_combined = cfg_dict['output_folder_combined']
+# program_name = cfg_dict['program_name']
 
 
 def gen_preview_image(old_html, new_html, uid, output_folder_combined,
@@ -86,7 +88,7 @@ def main():
     '''main docstring'''
     logger.info('-- NEW JOB --')
     logger.info(batch_file)
-    prod_ids = list(utilf.product_df(batch_file).product_id)
+    prod_ids = list(utilf.product_df('batches/'+batch_file).product_id)
     batch_folder = batch_file.replace('.csv', '')
 
     # check outlap with previous batches
@@ -100,15 +102,22 @@ def main():
     res = {}
 
     for prod_id in prod_ids:
-        logger.info('processing: ' + str(_id))
+        logger.info('processing: ' + str(prod_id))
         json_data = base.get_prod(_id=prod_id)
+        # print(type(json_data),list(json_data))
+        old_html = json_data['description'].replace('\r\n\r\n',' ').replace('\r\n',' ').replace('\\','')
 
-        old_html = json_data['description']
+        # print('isinstance(old_html, str) == ',isinstance(old_html, str))
+        # print(regex_dict)
+        # print(old_html)
         desc_obj = clean_description(old_html, regex_dict, logger)
-        d = desc_obj.flight_chars_dict()
+        # d = desc_obj.flight_chars_dict()
         new_html = desc_obj.clean()
-        base.put_prod_desc(_id=prod_id, new_html)
+        logger.info('modifying ' + str(prod_id) + ' within BigCommerce')
+        base.put_prod_desc(new_html, _id=prod_id)
 
+        res[prod_id] = [prod_id,old_html,new_html]
+    pd.DataFrame(res).to_csv('test.csv')
 
 if __name__ == '__main__':
     main()
