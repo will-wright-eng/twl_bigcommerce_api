@@ -44,7 +44,6 @@ class base_api(object):
         self.logger.info('converting paginated json to dataframe')
         dfs = []
         for page in data:
-
             df = pd.DataFrame(data[page]['data'])
             dfs.append(df)
         df = pd.concat(dfs)

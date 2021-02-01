@@ -3,14 +3,17 @@ Author: William Wright
 '''
 
 import re
-
+import logging
 
 class clean_description(object):
     '''clean_description docstring'''
     def __init__(self, desc, regex_dict, logger=None):
         self.desc = desc
         self.regex_dict = regex_dict
-        self.logger = logger
+        if logger:
+            self.logger = logging.getLogger(__name__)
+        else:
+            self.logger = logger
 
     def clean(self):
         self.d = self.flight_chars_dict()
@@ -52,10 +55,12 @@ class clean_description(object):
                     ]
                     d = {i: j for i, j in zip(cats, match)}
                 except IndexError as e:
-                    pass
-                    self.logger.error(
-                        str(e) +
-                        ' - no "Flight Chars" match in product description')
+                    if self.logger:
+                        self.logger.error(
+                            str(e) +
+                            ' - no "Flight Chars" match in product description')
+                    # else:
+                    #     print(e)
         return d
 
     def remove_content(self):
@@ -82,8 +87,11 @@ class clean_description(object):
                     self.desc = re.sub(sub1.format(i), sub2.format(j),
                                        self.desc)
                 except re.error as e:
-                    self.logger.error('sub_pattern')
-                    self.logger.error(e)
+                    if self.logger:
+                        self.logger.error('sub_pattern')
+                        self.logger.error(e)
+                    # else:
+                    #     print(e)
 
     def substitution(self):
         '''substitution docstring'''
@@ -117,10 +125,10 @@ class clean_description(object):
         pattern = '<h2>Specifications</h2> <ul> {}<li>Best'
         self.desc = re.sub(pattern.format(''), pattern.format(s3), self.desc)
         if 'Please note: stamp & exact color may vary' in self.desc:
-            self.logger.error(
-                '"please note" already present, likely this product id was already cleaned'
-            )
-            pass
+            if self.logger:
+                self.logger.error(
+                    '"please note" already present, likely this product id was already cleaned'
+                )
         else:
             note = '<li>Please note: stamp & exact color may vary</li></ul>'
             self.desc = re.sub('</ul>', note, self.desc)
