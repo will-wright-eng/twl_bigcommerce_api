@@ -9,7 +9,7 @@ import configparser
 import pandas as pd
 
 
-class base_api(object):
+class BigCommProductAPI(object):
     '''very descriptive docstring'''
     def __init__(self, project_name=None):
         if project_name:
@@ -28,22 +28,21 @@ class base_api(object):
             'x-auth-token': self.auth_token
         }
         self.url = "/stores/" + self.store_hash + "/v3/catalog/{endpoint}{attribute}"
+        self.conn = http.client.HTTPSConnection("api.bigcommerce.com")
 
     def get_prod(self, _id='8485'):
         '''very descriptive docstring'''
         self.logger.info('get product: ' + str(_id))
         endpoint = 'products'
         url = self.url.format(endpoint=endpoint, attribute='/' + str(_id))
-        conn = http.client.HTTPSConnection("api.bigcommerce.com")
-        conn.request("GET", url, headers=self.headers)
-        res = conn.getresponse()
+        self.conn.request("GET", url, headers=self.headers)
+        res = self.conn.getresponse()
         if res.code == 200:
             self.logger.info('response code: ' + str(res.code))
         else:
             self.logger.warning('response code: ' + str(res.code) +
                                 ' product id ' + str(_id) + ' unsuccessful')
         json_data = json.loads(res.read().decode("utf-8"))
-        # print(json_data['data']['description'])
         return json_data['data']
 
     def convert_pages_to_df(self, data):
@@ -66,13 +65,12 @@ class base_api(object):
         endpoint = 'products'
         url = self.url.format(endpoint=endpoint,
                               attribute="/?limit=250&page={}")
-        conn = http.client.HTTPSConnection("api.bigcommerce.com")
         while flag:
             page_num += 1
-            conn.request("GET",
+            self.conn.request("GET",
                               url.format(page_num),
                               headers=self.headers)
-            res = conn.getresponse().read()
+            res = self.conn.getresponse().read()
             try:
                 json_data = json.loads(res.decode("utf-8"))
             except JSONDecodeError as e:
@@ -88,9 +86,9 @@ class base_api(object):
             if json_data['meta']['pagination']['current_page'] == json_data[
                     'meta']['pagination']['total_pages']:
                 flag = False
-        self.data = data
+        
         try:
-            df = self.convert_pages_to_df(self.data)
+            df = self.convert_pages_to_df(data)
         except:
             self.logger.error(
                 'pages dictionary unable to convert to dataframe, call "data" attribute'
@@ -101,11 +99,9 @@ class base_api(object):
         '''very descriptive docstring'''
         self.logger.info('modify product description: ' + str(_id))
         payload = json.dumps({'description': new_html})
-        print(payload)
         url = self.url.format(endpoint='products', attribute='/' + str(_id))
-        conn = http.client.HTTPSConnection("api.bigcommerce.com")
-        conn.request("PUT", url, payload, headers=self.headers)
-        res = conn.getresponse()
+        self.conn.request("PUT", url, payload, headers=self.headers)
+        res = self.conn.getresponse()
         if res.code == 200:
             self.logger.info('response code: ' + str(res.code))
         else:
