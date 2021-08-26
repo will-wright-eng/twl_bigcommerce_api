@@ -1,8 +1,42 @@
-# twl_bigcommerce_api
-generalized methods for extracting data from BigCommerce API
+# TWL Reports
+Programatically extracting data from BigCommerce for custom reports
 
+Reports Breakout
+[data source | report | data view / pivot table]
+![reports_lineage](./reports_lineage.png)
 
-## Project 1: BigCommerce data backup
+## Notes
+```
+main.py docstring
 
-## Project 2: Product description cleanup
-This project is an evolution of repo `twl_inventory_rework` and associated folder `prod_rework_v2` -- where instead of exporting an updated product catolog via the BigCommerce GUI then importing updated description fields, again through the GUI, I'm utilizing the v3 API as documented [here](<add_link>).
+reports_list = ['inventory valuation','collections report','sales tax report']
+main(): run reports list
+
+Version 1:
+- product and orders classes will pull information from api
+- apply_filters method --> output: list of dataframes
+- write_to_excel method
+
+TODO:
+- email reports
+- add filter attributes to api calls
+- github actions for autoformatting via black -l 120 src/
+
+```
+
+## Tree
+
+```bash
+% tree --filelimit 9
+.
+├── LICENSE
+├── README.md
+├── notes
+├── reports_lineage.png
+└── src
+    ├── Untitled.ipynb
+    ├── bc_api_orders.py
+    ├── bc_api_product.py
+    ├── main.py
+    └── project.cfg
+```
