@@ -56,6 +56,5 @@ class BigCommOrdersAPI(object):
                 return json_data, flag, res
             data[page_num] = json_data
             if page_num > 1 and len(json_data) < 250:
-                print(page_num > 1, len(json_data))
                 flag = False
         return data
