@@ -1,6 +1,16 @@
 # TWL Reports
 Programatically extracting data from BigCommerce for custom reports
 
+## (1) MONTHLY REPORT OF SALES FOR SALES TAX PURPOSES BY PAYMENT METHOD
+- using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
+
+## (2) MONTHLY REPORTS FOR INVENTORY VALUATION
+- using [BigCommerce Catalog/Products v3 API](https://developer.bigcommerce.com/api-reference/store-management/catalog/products/getproducts) in BigCommProductsAPI class
+
+
+## (3) NEED A MONTHLY SALES REPORT BY CATEGORY or BY ITEM.
+- using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
+
 Reports Breakout
 [data source | report | data view / pivot table]
 ![reports_lineage](./reports_lineage.png)
@@ -34,7 +44,6 @@ TODO:
 ├── notes
 ├── reports_lineage.png
 └── src
-    ├── Untitled.ipynb
     ├── bc_api_orders.py
     ├── bc_api_product.py
     ├── main.py
