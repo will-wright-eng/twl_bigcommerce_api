@@ -17,7 +17,7 @@ class BigCommOrdersAPI(object):
     """very descriptive docstring"""
 
     def __init__(self, project_name=None):
-        configs = load_yml_configs('configs.yml')['bigcomm_creds']["bc_api_read-only"]
+        configs = load_yml_configs("configs.yml")["bigcomm_creds"]["bc_api_read-only"]
         self.store_hash = configs["store_hash"]
         self.auth_token = configs["x_auth_token"]
         self.headers = {

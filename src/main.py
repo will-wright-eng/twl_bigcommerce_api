@@ -13,24 +13,44 @@ TODO:
 - add filter attributes to api calls
 - github actions for autoformatting via black -l 120 src/
 
+API json response schema
+https://jsonapi.org/
+
 """
 
-# import os
-# import http.client
-# import json
-# import logging
-# import inspect
-# import configparser
-# import datetime as dt
-
+import numpy as np
 import pandas as pd
 
-# import modules.util_fxns as utilf
-from modules.base_api import BigCommProductAPI
+from modules.bc_api_orders import BigCommOrdersAPI
+from modules.bc_api_products import BigCommProductAPI
 
-project_name = "test"
-base = BigCommProductAPI(project_name)
-df = base.get_all_prods()
+# project_name = "test"
+# base = BigCommProductAPI(project_name)
+# df = base.get_all_prods()
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
+
+###
+
+bco_api = BigCommOrdersAPI()
+tmp = bco_api.get_all()
+
+dfs = []
+for ind, data in tmp.items():
+    dfs.append(pd.DataFrame(data))
+
+df = pd.concat(dfs, axis=0)
+
+order_id = "1455897"
+bco_api.get_order_details(order_id)
+
+
+# ###
+
+# from bc_api_product import BigCommProductAPI
+
+# base = BigCommProductAPI()
+# df = base.get_all_prods()
+
+# df
