@@ -15,7 +15,7 @@ class BigCommOrdersAPI(object):
 
     def __init__(self, project_name=None):
         config = configparser.ConfigParser()
-        config.read("project.cfg")
+        config.read("./../project.cfg")
         configs = dict(config.items("bc_api_read-only"))
         self.store_hash = configs["store_hash"]
         self.auth_token = configs["x_auth_token"]

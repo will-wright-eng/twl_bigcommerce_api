@@ -21,7 +21,7 @@ class BigCommProductAPI(object):
         else:
             self.logger = logging.getLogger("base_api_dev")
         config = configparser.ConfigParser()
-        config.read("project.cfg")
+        config.read("./../project.cfg")
         configs = dict(config.items("bc_api_read_and_write"))
         self.store_hash = configs["store_hash"]
         self.auth_token = configs["x_auth_token"]
