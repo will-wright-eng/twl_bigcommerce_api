@@ -1,30 +1,7 @@
-appnope @ file:///opt/concourse/worker/volumes/live/5f13e5b3-5355-4541-5fc3-f08850c73cf9/volume/appnope_1606859448618/work
-backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
 certifi==2021.5.30
-debugpy @ file:///opt/concourse/worker/volumes/live/0549da12-d109-47ea-668a-9e172153d243/volume/debugpy_1629222704203/work
-decorator @ file:///tmp/build/80754af9/decorator_1621259047763/work
 et-xmlfile==1.1.0
-ipykernel @ file:///opt/concourse/worker/volumes/live/f8f0ca7d-4772-42a8-6355-ed26f8c5e652/volume/ipykernel_1629995108558/work/dist/ipykernel-6.2.0-py3-none-any.whl
-ipython @ file:///opt/concourse/worker/volumes/live/07715ef4-018a-4861-7ab6-83f7f2b21c2b/volume/ipython_1628243930772/work
-ipython-genutils @ file:///tmp/build/80754af9/ipython_genutils_1606773439826/work
-jedi @ file:///opt/concourse/worker/volumes/live/904d39c2-2f20-46c0-487d-9a3d2725434d/volume/jedi_1611333757211/work
-jupyter-client @ file:///tmp/build/80754af9/jupyter_client_1616770841739/work
-jupyter-core @ file:///opt/concourse/worker/volumes/live/c8df8dce-dbb3-46e7-649c-adf4ed2dd00a/volume/jupyter_core_1612213293829/work
-matplotlib-inline @ file:///tmp/build/80754af9/matplotlib-inline_1628242447089/work
 numpy==1.21.2
 openpyxl==3.0.7
 pandas==1.3.2
-parso @ file:///tmp/build/80754af9/parso_1617223946239/work
-pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
-pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
-prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1616415428029/work
-ptyprocess @ file:///tmp/build/80754af9/ptyprocess_1609355006118/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl
-Pygments @ file:///tmp/build/80754af9/pygments_1629234116488/work
-python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
 pytz==2021.1
 PyYAML==5.4.1
-pyzmq @ file:///opt/concourse/worker/volumes/live/70168cdd-6dcc-4eea-5d88-71effee1f426/volume/pyzmq_1628276017199/work
-six @ file:///tmp/build/80754af9/six_1623709665295/work
-tornado @ file:///opt/concourse/worker/volumes/live/05341796-4198-4ded-4a9a-332fde3cdfd1/volume/tornado_1606942323372/work
-traitlets @ file:///home/ktietz/src/ci/traitlets_1611929699868/work
-wcwidth @ file:///tmp/build/80754af9/wcwidth_1593447189090/work
