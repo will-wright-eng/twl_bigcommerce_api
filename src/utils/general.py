@@ -47,6 +47,7 @@ def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def export_to_excel(outputs: dict, export_file_name: str):
+    """https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_excel.html"""
     writer = pd.ExcelWriter(f"{export_file_name}.xlsx")
     for table in outputs:
         df = outputs[table]
