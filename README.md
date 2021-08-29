@@ -1,14 +1,20 @@
 # TWL Reports
 Programatically extracting data from BigCommerce for custom reports
 
-## (1) MONTHLY REPORT OF SALES FOR SALES TAX PURPOSES BY PAYMENT METHOD
+## Table of Contents
+- [Reports Summary](#reports-summary)
+- [Notes](#notes)
+- [Repo Tree](#repo-tree)
+
+## Reports Summary
+### (1) MONTHLY REPORT OF SALES FOR SALES TAX PURPOSES BY PAYMENT METHOD
 - using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
 
-## (2) MONTHLY REPORTS FOR INVENTORY VALUATION
+### (2) MONTHLY REPORTS FOR INVENTORY VALUATION
 - using [BigCommerce Catalog/Products v3 API](https://developer.bigcommerce.com/api-reference/store-management/catalog/products/getproducts) in BigCommProductsAPI class
 
 
-## (3) NEED A MONTHLY SALES REPORT BY CATEGORY or BY ITEM.
+### (3) NEED A MONTHLY SALES REPORT BY CATEGORY or BY ITEM.
 - using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
 
 Reports Breakout
@@ -34,7 +40,7 @@ TODO:
 
 ```
 
-## Tree
+## Repo Tree
 
 ```bash
 % tree --filelimit 9
