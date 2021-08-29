@@ -11,6 +11,7 @@ import pandas as pd
 
 from json import JSONDecodeError
 
+
 class BigCommProductAPI(object):
     """very descriptive docstring"""
 

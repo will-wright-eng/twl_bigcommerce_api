@@ -34,16 +34,18 @@ class BigCommOrdersAPI(object):
         try:
             json_data = json.loads(res.decode("utf-8"))
         except JSONDecodeError as e:
-            print('error:'+e)
+            print("error:" + e)
         return json_data
 
-    def get_all(self, min_date_modified: str ='2021-08-01') -> dict:
+    def get_all(self, min_date_modified: str = "2021-08-01") -> dict:
         """very descriptive docstring"""
         data = {}
         flag = True
         page_num = 0
         endpoint = "orders"
-        url = self.url.format(endpoint=endpoint, attribute="/?limit=250&page={}"+f"&min_date_modified={min_date_modified}")
+        url = self.url.format(
+            endpoint=endpoint, attribute="/?limit=250&page={}" + f"&min_date_modified={min_date_modified}"
+        )
         while flag:
             page_num += 1
             self.conn.request("GET", url.format(page_num), headers=self.headers)
@@ -52,7 +54,7 @@ class BigCommOrdersAPI(object):
             try:
                 json_data = json.loads(res.decode("utf-8"))
             except JSONDecodeError as e:
-                print('error:'+e)
+                print("error:" + e)
                 return json_data, flag, res
             data[page_num] = json_data
             if page_num > 1 and len(json_data) < 250:

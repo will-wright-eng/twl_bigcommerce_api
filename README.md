@@ -48,10 +48,17 @@ TODO:
 ├── LICENSE
 ├── README.md
 ├── notes
+│   ├── 20210824_reports_email.md
 ├── reports_lineage.png
 └── src
-    ├── bc_api_orders.py
-    ├── bc_api_product.py
+    ├── Untitled.ipynb
+    ├── __init__.py
     ├── main.py
-    └── project.cfg
+    ├── modules
+    │ ├── bc_api_orders.py
+    │ └── bc_api_product.py
+    ├── project.cfg
+    └── reports
+        ├── inventory_reports.py
+        └── orders_reports.py
 ```
