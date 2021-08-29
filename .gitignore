@@ -10,6 +10,7 @@ project.cfg
 
 # file extensions
 *.csv
+*.xlsx
 
 # folders
 batches/
