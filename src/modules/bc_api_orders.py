@@ -1,22 +1,23 @@
 """docstring"""
-import http.client
+
+import yaml
 import json
 import logging
 import inspect
-import configparser
+import http.client
 
 import pandas as pd
 
 from json import JSONDecodeError
+
+from utils.general import load_yml_configs
 
 
 class BigCommOrdersAPI(object):
     """very descriptive docstring"""
 
     def __init__(self, project_name=None):
-        config = configparser.ConfigParser()
-        config.read("./../project.cfg")
-        configs = dict(config.items("bc_api_read-only"))
+        configs = load_yml_configs('configs.yml')['bigcomm_creds']["bc_api_read-only"]
         self.store_hash = configs["store_hash"]
         self.auth_token = configs["x_auth_token"]
         self.headers = {

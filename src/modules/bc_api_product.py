@@ -1,6 +1,6 @@
 """docstring"""
 
-
+import yaml
 import json
 import logging
 import inspect
@@ -11,18 +11,14 @@ import pandas as pd
 
 from json import JSONDecodeError
 
+from utils.general import load_yml_configs
+
 
 class BigCommProductAPI(object):
     """very descriptive docstring"""
 
     def __init__(self, project_name=None):
-        if project_name:
-            self.logger = logging.getLogger(project_name)
-        else:
-            self.logger = logging.getLogger("base_api_dev")
-        config = configparser.ConfigParser()
-        config.read("./../project.cfg")
-        configs = dict(config.items("bc_api_read_and_write"))
+        configs = load_yml_configs('configs.yml')['bigcomm_creds']["bc_api_read-only"]
         self.store_hash = configs["store_hash"]
         self.auth_token = configs["x_auth_token"]
 
