@@ -14,7 +14,7 @@ from json import JSONDecodeError
 from utils.general import load_yml_configs
 
 
-class BigCommProductAPI(object):
+class BigCommProductsAPI(object):
     """very descriptive docstring"""
 
     def __init__(self, project_name=None):
@@ -40,7 +40,13 @@ class BigCommProductAPI(object):
         if res.code == 200:
             self.logger.info("response code: " + str(res.code))
         else:
-            self.logger.warning("response code: " + str(res.code) + " product id " + str(_id) + " unsuccessful")
+            self.logger.warning(
+                "response code: "
+                + str(res.code)
+                + " product id "
+                + str(_id)
+                + " unsuccessful"
+            )
         json_data = json.loads(res.read().decode("utf-8"))
         return json_data["data"]
 
@@ -80,13 +86,18 @@ class BigCommProductAPI(object):
                     + " of "
                     + str(json_data["meta"]["pagination"]["total_pages"])
                 )
-            if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
+            if (
+                json_data["meta"]["pagination"]["current_page"]
+                == json_data["meta"]["pagination"]["total_pages"]
+            ):
                 flag = False
 
         try:
             df = self.convert_pages_to_df(data)
         except:
-            self.logger.error('pages dictionary unable to convert to dataframe, call "data" attribute')
+            self.logger.error(
+                'pages dictionary unable to convert to dataframe, call "data" attribute'
+            )
         return df
 
     def put_prod_desc(self, new_html, _id="8485"):
@@ -99,4 +110,10 @@ class BigCommProductAPI(object):
         if res.code == 200:
             self.logger.info("response code: " + str(res.code))
         else:
-            self.logger.warning("response code: " + str(res.code) + " product id " + str(_id) + " unsuccessful")
+            self.logger.warning(
+                "response code: "
+                + str(res.code)
+                + " product id "
+                + str(_id)
+                + " unsuccessful"
+            )

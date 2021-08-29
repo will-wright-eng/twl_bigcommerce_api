@@ -29,7 +29,9 @@ class BigCommOrdersAPI(object):
         self.conn = http.client.HTTPSConnection("api.bigcommerce.com")
 
     def get_order_details(self, order_id: str) -> dict:
-        url = f"https://api.bigcommerce.com/stores/yt68tfv9/v2/orders/{order_id}/products"
+        url = (
+            f"https://api.bigcommerce.com/stores/yt68tfv9/v2/orders/{order_id}/products"
+        )
         self.conn.request("GET", url, headers=self.headers)
         res = self.conn.getresponse().read()
         try:
@@ -45,7 +47,8 @@ class BigCommOrdersAPI(object):
         page_num = 0
         endpoint = "orders"
         url = self.url.format(
-            endpoint=endpoint, attribute="/?limit=250&page={}" + f"&min_date_modified={min_date_modified}"
+            endpoint=endpoint,
+            attribute="/?limit=250&page={}" + f"&min_date_modified={min_date_modified}",
         )
         while flag:
             page_num += 1

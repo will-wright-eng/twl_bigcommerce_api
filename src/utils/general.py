@@ -33,15 +33,21 @@ def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
     df.payment_method = df.payment_method.apply(lambda x: null_fill(x))
 
     # amount columns set to float
-    dollar_cols = [i for i in list(df) if "subtotal" in i] + [i for i in list(df) if "cost" in i]
+    dollar_cols = [i for i in list(df) if "subtotal" in i] + [
+        i for i in list(df) if "cost" in i
+    ]
     for col in dollar_cols:
         df[col] = df[col].astype(float)
 
     # datetime date cols
     for date_col in ["date_created", "date_modified", "date_shipped"]:
         df[date_col + "_date"] = pd.to_datetime(df[date_col])
-        df[date_col + "_date"] = df[date_col + "_date"].apply(lambda x: str(x).split(" ")[0])
-        df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
+        df[date_col + "_date"] = df[date_col + "_date"].apply(
+            lambda x: str(x).split(" ")[0]
+        )
+        df[date_col + "_month"] = df[date_col + "_date"].apply(
+            lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1])
+        )
 
     return df
 
