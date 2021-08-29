@@ -44,21 +44,25 @@ TODO:
 
 ```bash
 % tree --filelimit 9
+
 .
 ├── LICENSE
 ├── README.md
-├── notes
-│   ├── 20210824_reports_email.md
 ├── reports_lineage.png
+├── requirements.txt
 └── src
-    ├── Untitled.ipynb
     ├── __init__.py
+    ├── configs.yml
     ├── main.py
     ├── modules
-    │ ├── bc_api_orders.py
-    │ └── bc_api_product.py
-    ├── project.cfg
-    └── reports
-        ├── inventory_reports.py
-        └── orders_reports.py
+    │   ├── __init__.py
+    │   ├── bc_api_orders.py
+    │   └── bc_api_product.py
+    ├── reports
+    │   ├── __init__.py
+    │   ├── inventory_reports.py
+    │   └── orders_reports.py
+    └── utils
+        └── general.py
+
 ```
