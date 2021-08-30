@@ -18,14 +18,34 @@ https://jsonapi.org/
 
 """
 
+
 import numpy as np
 import pandas as pd
 
 from modules.bc_api_orders import BigCommOrdersAPI
-from modules.bc_api_products import BigCommProductAPI
 
-from utils.general import export_to_excel
-from reports.orders_reports import sales_report_configs, generate_pivot_report
+from utils.general import export_to_excel, clean_orders
+from reports.orders_reports import sales_tax_report_configs, generate_pivot_report
+
+
+# get data
+bco_api = BigCommOrdersAPI()
+tmp = bco_api.get_all()
+
+dfs = []
+for ind, data in tmp.items():
+    dfs.append(pd.DataFrame(data))
+    
+df = pd.concat(dfs,axis=0)
+
+# generate reports
+configs = sales_tax_report_configs()
+report, attributes = generate_pivot_report(df=clean_orders(df), configs=configs)
+
+# export
+export_to_excel(report['tables'], report['attributes']['export_file_name'])
+
+
 
 # project_name = "test"
 # base = BigCommProductAPI(project_name)
@@ -35,19 +55,6 @@ from reports.orders_reports import sales_report_configs, generate_pivot_report
 #     main()
 
 ###
-
-bco_api = BigCommOrdersAPI()
-tmp = bco_api.get_all()
-
-dfs = []
-for ind, data in tmp.items():
-    dfs.append(pd.DataFrame(data))
-
-df = pd.concat(dfs, axis=0)
-report, attributes = generate_pivot_report(
-    df=clean_orders(df), configs=sales_report_configs()
-)
-
 
 # order_id = "1455897"
 # bco_api.get_order_details(order_id)
