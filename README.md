@@ -19,7 +19,7 @@ Programatically extracting data from BigCommerce for custom reports
 
 Reports Breakout
 [data source | report | data view / pivot table]
-![reports_lineage](./reports_lineage.png)
+![reports_lineage](.images/reports_lineage.png)
 
 ## Notes
 ```
@@ -43,11 +43,11 @@ TODO:
 ## Repo Tree
 ```bash
 % tree --filelimit 9
-
 .
 ├── LICENSE
 ├── README.md
-├── reports_lineage.png
+├── images
+│   └── reports_lineage.png
 ├── requirements.txt
 └── src
     ├── __init__.py
@@ -55,15 +55,13 @@ TODO:
     ├── main.py
     ├── modules
     │   ├── __init__.py
-    │   ├── bc_api_orders.py
-    │   └── bc_api_product.py
+    │   └── bigcomm_api.py
     ├── reports
     │   ├── __init__.py
-    │   ├── inventory_reports.py
-    │   └── orders_reports.py
+    │   ├── orders_reports.py
+    │   └── product_reports.py
     └── utils
         └── general.py
-
 ```
 
 ## TODO

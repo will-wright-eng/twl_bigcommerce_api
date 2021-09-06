@@ -26,11 +26,26 @@ from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
 from utils.general import export_to_excel, clean_orders
-from reports.orders_reports import sales_tax_report_configs, generate_pivot_report
+from reports.orders_reports import sales_tax_report_configs, sales_by_category_report_configs
+
+
 
 def get_orders_data() -> pd.DataFrame:
     # get data
     base = BigCommOrdersAPI()
+    tmp = base.get_all()
+
+    dfs = []
+    for ind, data in tmp.items():
+        dfs.append(pd.DataFrame(data))
+        
+    df = pd.concat(dfs,axis=0)
+    df = clean_orders(df)
+    return df
+
+def get_product_data() -> pd.DataFrame:
+    # get data
+    base = BigCommProductsAPI()
     tmp = base.get_all()
 
     dfs = []
