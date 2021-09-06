@@ -45,13 +45,13 @@ def sales_by_category_report_configs():
     inputs = {}
     inputs["values"] = ["subtotal_ex_tax"]
     inputs["index"] = ["date_created_month", "date_created_date"]
-    inputs["columns"] = ["payment_method"] #<-- EDIT
+    inputs["columns"] = ["payment_method"]  # <-- EDIT
     input_dict["pivot_by_day"] = inputs
 
     inputs = {}
     inputs["values"] = ["subtotal_ex_tax", "subtotal_inc_tax", "subtotal_tax"]
     inputs["index"] = ["date_created_month"]
-    inputs["columns"] = ["payment_method"] #<-- EDIT
+    inputs["columns"] = ["payment_method"]  # <-- EDIT
     input_dict["pivot_by_month"] = inputs
 
     TODAY = str(dt.datetime.today()).split(" ")[0]
@@ -60,5 +60,3 @@ def sales_by_category_report_configs():
     configs["export_file_name"] = f"{TODAY}_sales_tax_report_post_aug01"
     configs["input_dict"] = input_dict
     return configs
-
-

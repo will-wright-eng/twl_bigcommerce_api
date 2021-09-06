@@ -35,21 +35,15 @@ def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
     df.payment_method = df.payment_method.apply(lambda x: null_fill(x))
 
     # amount columns set to float
-    dollar_cols = [i for i in list(df) if "subtotal" in i] + [
-        i for i in list(df) if "cost" in i
-    ]
+    dollar_cols = [i for i in list(df) if "subtotal" in i] + [i for i in list(df) if "cost" in i]
     for col in dollar_cols:
         df[col] = df[col].astype(float)
 
     # datetime date cols
     for date_col in ["date_created", "date_modified", "date_shipped"]:
         df[date_col + "_date"] = pd.to_datetime(df[date_col])
-        df[date_col + "_date"] = df[date_col + "_date"].apply(
-            lambda x: str(x).split(" ")[0]
-        )
-        df[date_col + "_month"] = df[date_col + "_date"].apply(
-            lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1])
-        )
+        df[date_col + "_date"] = df[date_col + "_date"].apply(lambda x: str(x).split(" ")[0])
+        df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
 
     return df
 
@@ -61,11 +55,10 @@ def export_to_excel(outputs: dict, export_file_name: str):
         df = outputs[table]
         df.to_excel(writer, sheet_name=table)
     writer.save()
-    return f'export to {export_file_name}.xlsx complete'
+    return f"export to {export_file_name}.xlsx complete"
 
-def generate_pivot_report(
-    df: pd.DataFrame, report_id: str = "testing", **configs
-) -> tuple:
+
+def generate_pivot_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> tuple:
 
     REPORT_TITLE = configs.get("report_title")
     input_dict = configs.get("input_dict")
@@ -116,9 +109,7 @@ def generate_pivot_report(
     #
     attributes = {}
     attributes["report_title"] = REPORT_TITLE
-    tmp = {
-        "table " + str(i): j for i, j in zip(range(len(list(outputs))), list(outputs))
-    }
+    tmp = {"table " + str(i): j for i, j in zip(range(len(list(outputs))), list(outputs))}
     attributes.update(tmp)
     tmp = pd.DataFrame(attributes.items())
     outputs["table_of_contents"] = tmp

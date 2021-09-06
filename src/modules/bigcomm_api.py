@@ -28,10 +28,8 @@ class BigCommOrdersAPI(object):
         self.url = "/stores/" + self.store_hash + "/v2/{endpoint}{attribute}"
         self.conn = http.client.HTTPSConnection("api.bigcommerce.com")
 
-    def get_order_details(self, order_id: str) -> dict:
-        url = (
-            f"https://api.bigcommerce.com/stores/yt68tfv9/v2/orders/{order_id}/products"
-        )
+    def get_product_details(self, order_id: str) -> dict:
+        url = f"https://api.bigcommerce.com/stores/yt68tfv9/v2/orders/{order_id}/products"
         self.conn.request("GET", url, headers=self.headers)
         res = self.conn.getresponse().read()
         try:
@@ -93,7 +91,7 @@ class BigCommProductsAPI(object):
         df.reset_index(drop=True, inplace=True)
         return df
 
-    def get_all_prods(self) -> pd.DataFrame:
+    def get_all(self) -> pd.DataFrame:
         """very descriptive docstring"""
         # self.logger.info("get all products in catalog")
         data = {}
@@ -101,7 +99,7 @@ class BigCommProductsAPI(object):
         page_num = 0
         endpoint = "products"
         url = self.url.format(endpoint=endpoint, attribute="/?limit=250&page={}")
-        
+
         while flag:
             page_num += 1
             self.conn.request("GET", url.format(page_num), headers=self.headers)
@@ -119,17 +117,12 @@ class BigCommProductsAPI(object):
                     + " of "
                     + str(json_data["meta"]["pagination"]["total_pages"])
                 )
-            if (
-                json_data["meta"]["pagination"]["current_page"]
-                == json_data["meta"]["pagination"]["total_pages"]
-            ):
+            if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
                 flag = False
 
         try:
             df = self.convert_pages_to_df(data)
         except:
             pass
-            print(
-                'pages dictionary unable to convert to dataframe, call "data" attribute'
-            )
+            print('pages dictionary unable to convert to dataframe, call "data" attribute')
         return df
