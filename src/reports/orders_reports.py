@@ -62,13 +62,12 @@ def sales_by_category_report_configs():
     configs["input_dict"] = input_dict
     return configs
 
-
 def generate_pivot_report(
-    df: pd.DataFrame, configs: dict, report_id: str = "testing"
+    df: pd.DataFrame, report_id: str = "testing", **configs
 ) -> tuple:
 
-    REPORT_TITLE = configs["report_title"]
-    input_dict = configs["input_dict"]
+    REPORT_TITLE = configs.get("report_title")
+    input_dict = configs.get("input_dict")
 
     # ## API JSON standard
     # # top level
@@ -83,7 +82,7 @@ def generate_pivot_report(
     report["attributes"] = {
         "title": REPORT_TITLE,
         "input_settings": input_dict,
-        "export_file_name": configs["export_file_name"],
+        "export_file_name": configs.get("export_file_name"),
     }
     report["tables"] = {}  # {'table1': pd.DataFrame, 'table2': pd.DataFrame, ...}
 

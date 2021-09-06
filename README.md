@@ -5,6 +5,7 @@ Programatically extracting data from BigCommerce for custom reports
 - [Reports Summary](#reports-summary)
 - [Notes](#notes)
 - [Repo Tree](#repo-tree)
+- [TODO](#todo)
 
 ## Reports Summary
 ### (1) MONTHLY REPORT OF SALES FOR SALES TAX PURPOSES BY PAYMENT METHOD
@@ -12,7 +13,6 @@ Programatically extracting data from BigCommerce for custom reports
 
 ### (2) MONTHLY REPORTS FOR INVENTORY VALUATION
 - using [BigCommerce Catalog/Products v3 API](https://developer.bigcommerce.com/api-reference/store-management/catalog/products/getproducts) in BigCommProductsAPI class
-
 
 ### (3) NEED A MONTHLY SALES REPORT BY CATEGORY or BY ITEM.
 - using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
@@ -41,7 +41,6 @@ TODO:
 ```
 
 ## Repo Tree
-
 ```bash
 % tree --filelimit 9
 
@@ -66,3 +65,8 @@ TODO:
         └── general.py
 
 ```
+
+## TODO
+- reports 2 & 3
+- email module
+- abstract out report parameters

@@ -22,28 +22,37 @@ https://jsonapi.org/
 import numpy as np
 import pandas as pd
 
-from modules.bc_api_orders import BigCommOrdersAPI
+from modules.bigcomm_api import BigCommOrdersAPI
+from modules.bigcomm_api import BigCommProductsAPI
 
 from utils.general import export_to_excel, clean_orders
 from reports.orders_reports import sales_tax_report_configs, generate_pivot_report
 
+def get_orders_data() -> pd.DataFrame:
+    # get data
+    base = BigCommOrdersAPI()
+    tmp = base.get_all()
 
-# get data
-bco_api = BigCommOrdersAPI()
-tmp = bco_api.get_all()
+    dfs = []
+    for ind, data in tmp.items():
+        dfs.append(pd.DataFrame(data))
+        
+    df = pd.concat(dfs,axis=0)
+    df = clean_orders(df)
+    return df
 
-dfs = []
-for ind, data in tmp.items():
-    dfs.append(pd.DataFrame(data))
-    
-df = pd.concat(dfs,axis=0)
+def generate_sales_tax_report(df:pd.DataFrame) -> str:
+    # generate reports
+    configs = sales_tax_report_configs()
+    report, attributes = generate_pivot_report(df=df, **configs)
+    # export
+    status = export_to_excel(report['tables'], report['attributes']['export_file_name'])
+    return status
 
-# generate reports
-configs = sales_tax_report_configs()
-report, attributes = generate_pivot_report(df=clean_orders(df), configs=configs)
-
-# export
-export_to_excel(report['tables'], report['attributes']['export_file_name'])
+if __name__ == "__main__":
+    df = get_orders_data()
+    status = generate_sales_tax_report(df)
+    print(status)
 
 
 
@@ -51,8 +60,7 @@ export_to_excel(report['tables'], report['attributes']['export_file_name'])
 # base = BigCommProductAPI(project_name)
 # df = base.get_all_prods()
 
-# if __name__ == "__main__":
-#     main()
+
 
 ###
 

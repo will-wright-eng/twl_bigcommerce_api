@@ -58,4 +58,5 @@ def export_to_excel(outputs: dict, export_file_name: str):
     for table in outputs:
         df = outputs[table]
         df.to_excel(writer, sheet_name=table)
-    return writer.save()
+    writer.save()
+    return f'export to {export_file_name}.xlsx complete'
