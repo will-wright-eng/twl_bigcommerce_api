@@ -1,11 +1,14 @@
 """general file for utils"""
 
+import os
 import yaml
+import shutil
 import configparser
+import datetime as dt
 
+import boto3
 import numpy as np
 import pandas as pd
-import datetime as dt
 
 
 def load_yml_configs(file_name: str) -> dict:
@@ -24,7 +27,16 @@ def load_config_file(config_part: str) -> dict:
     return configs
 
 
-def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
+def convert_datetime_cols(df: pd.DataFrame) -> pd.DataFrame:
+    # datetime date cols
+    for date_col in [i for i in list(df) if 'date' in i]:
+        df[date_col + "_date"] = pd.to_datetime(df[date_col])
+        df[date_col + "_date"] = df[date_col + "_date"].apply(lambda x: str(x).split(" ")[0])
+        df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
+    return df
+
+
+def clean_order_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     # manual payment fill
     def null_fill(x):
         if x == "":
@@ -39,18 +51,39 @@ def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
     for col in dollar_cols:
         df[col] = df[col].astype(float)
 
-    # datetime date cols
-    for date_col in ["date_created", "date_modified", "date_shipped"]:
-        df[date_col + "_date"] = pd.to_datetime(df[date_col])
-        df[date_col + "_date"] = df[date_col + "_date"].apply(lambda x: str(x).split(" ")[0])
-        df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
+    return convert_datetime_cols(df)
 
-    return df
+
+def top_level_category(ele):
+    ele = ele.split("/")
+    if len(ele) <= 1:
+        return np.nan
+    else:
+        return ele[1]
+
+
+def clean_product_dataframe(df:pd.DataFrame, base) -> pd.DataFrame:
+    # join in brands table
+    brand_df = base.get_brands()
+    brand_df = brand_df[["id", "name"]]
+    brand_df.columns = ["brand_id", "brand_name"]
+    df = df.merge(brand_df, how="left", on="brand_id")
+
+    # category from custom url
+    df["category_all"] = ["/".join(i["url"].split("/")[:-2]) for i in list(df.custom_url)]
+    df["category_top"] = df.category_all.apply(lambda x: top_level_category(x))
+
+    return convert_datetime_cols(df)
 
 
 def export_to_excel(outputs: dict, export_file_name: str):
     """https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_excel.html"""
     writer = pd.ExcelWriter(f"{export_file_name}.xlsx")
+    if 'table_of_contents' in list(outputs):
+        df = outputs['table_of_contents']
+        df.to_excel(writer, sheet_name='table_of_contents')
+        outputs.pop('table_of_contents')
+    
     for table in outputs:
         df = outputs[table]
         df.to_excel(writer, sheet_name=table)
@@ -117,3 +150,37 @@ def generate_pivot_report(df: pd.DataFrame, report_id: str = "testing", **config
     report["tables"] = outputs
 
     return report, attributes
+
+
+def upload_to_s3_v2(local_path: str, bucket_name: str, object_name: str):
+    """
+    path_output: local dir file path
+    bucket_name: name of s3 bucket
+    key_path: key path + file name = object name
+    """
+    s3 = boto3.client("s3")
+    response = s3.upload_file(local_path, bucket_name, object_name)
+    return response
+
+
+def backup_dataframe(df: pd.DataFrame, data_table: str):
+    """
+    - generates tmp folders
+    - saves csv
+    - exports to S3 bucket
+    - deletes tmp directory
+    """
+    S3_BUCKET = "twl-dev"
+    TODAY = str(dt.datetime.today()).split(" ")[0]
+    file_name = f"{TODAY}_{data_table}.csv"
+    folder = f"tmp_backup/backup_{data_table}"
+    local_path = os.path.join(folder, file_name)
+    object_name = f"backup_{data_table}/{file_name}"
+
+    try:
+        os.makedirs(folder, exist_ok=True)
+        df.to_csv(local_path)
+        resp = upload_to_s3_v2(local_path=local_path, bucket_name=S3_BUCKET, object_name=object_name)
+    finally:
+        shutil.rmtree("tmp_backup")
+    return resp

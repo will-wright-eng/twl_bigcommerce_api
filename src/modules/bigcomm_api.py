@@ -126,3 +126,72 @@ class BigCommProductsAPI(object):
             pass
             print('pages dictionary unable to convert to dataframe, call "data" attribute')
         return df
+
+    def get_all(self) -> pd.DataFrame:
+        """very descriptive docstring"""
+        # self.logger.info("get all products in catalog")
+        data = {}
+        flag = True
+        page_num = 0
+        endpoint = "products"
+        url = self.url.format(endpoint=endpoint, attribute="/?limit=250&page={}")
+
+        while flag:
+            page_num += 1
+            self.conn.request("GET", url.format(page_num), headers=self.headers)
+            res = self.conn.getresponse().read()
+            try:
+                json_data = json.loads(res.decode("utf-8"))
+            except JSONDecodeError as e:
+                print(e)
+
+            data[page_num] = json_data
+            if page_num % 10 == 0:
+                print(
+                    f'retrieving page {str(json_data["meta"]["pagination"]["current_page"])} of {str(json_data["meta"]["pagination"]["total_pages"])}'
+                )
+            if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
+                flag = False
+
+        try:
+            df = self.convert_pages_to_df(data)
+        except:
+            pass
+            print('pages dictionary unable to convert to dataframe, call "data" attribute')
+        return df
+
+    def get_brands(self) -> pd.DataFrame:
+        """very descriptive docstring"""
+        # self.logger.info("get all products in catalog")
+        data = {}
+        flag = True
+        page_num = 0
+        endpoint = "brands"
+        url = self.url.format(endpoint=endpoint, attribute="/?limit=250&page={}")
+
+        while flag:
+            page_num += 1
+            self.conn.request("GET", url.format(page_num), headers=self.headers)
+            res = self.conn.getresponse().read()
+            try:
+                json_data = json.loads(res.decode("utf-8"))
+            except JSONDecodeError as e:
+                print(e)
+
+            data[page_num] = json_data
+            if page_num % 10 == 0:
+                print(
+                    "retrieving page "
+                    + str(json_data["meta"]["pagination"]["current_page"])
+                    + " of "
+                    + str(json_data["meta"]["pagination"]["total_pages"])
+                )
+            if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
+                flag = False
+
+        try:
+            df = self.convert_pages_to_df(data)
+        except:
+            pass
+            print('pages dictionary unable to convert to dataframe, call "data" attribute')
+        return df
