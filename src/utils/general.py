@@ -144,7 +144,7 @@ def generate_pivot_report(df: pd.DataFrame, report_id: str = "testing", **config
     tmp.columns = ["sum"]
     outputs["sum_by_column"] = tmp
 
-    # outputs["raw_data"] = df
+    outputs["raw_data"] = df
 
     #
     attributes = {}

@@ -71,6 +71,7 @@ def generate_inventory_valuation_report(df: pd.DataFrame) -> str:
     configs = report_configs.inventory_valuation_report_configs()
     report, attributes = utils.generate_pivot_report(df=df, **configs)
     # export
+    df.drop(['description'], axis=1, inplace=True)
     status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
     return status
 
