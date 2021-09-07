@@ -27,9 +27,16 @@ def load_config_file(config_part: str) -> dict:
     return configs
 
 
+def remove_low_count_cols(df):
+    meta = pd.DataFrame([list(df), df.dtypes, df.count()]).T
+    meta.columns = ["col_name", "col_dtype", "col_count"]
+    df = df[list(meta.loc[meta.col_count > 0.9 * len(meta)].col_name)]
+    return df
+
+
 def convert_datetime_cols(df: pd.DataFrame) -> pd.DataFrame:
     # datetime date cols
-    for date_col in [i for i in list(df) if 'date' in i]:
+    for date_col in [i for i in list(df) if "date" in i]:
         df[date_col + "_date"] = pd.to_datetime(df[date_col])
         df[date_col + "_date"] = df[date_col + "_date"].apply(lambda x: str(x).split(" ")[0])
         df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
@@ -62,7 +69,7 @@ def top_level_category(ele):
         return ele[1]
 
 
-def clean_product_dataframe(df:pd.DataFrame, base) -> pd.DataFrame:
+def clean_product_dataframe(df: pd.DataFrame, base) -> pd.DataFrame:
     # join in brands table
     brand_df = base.get_brands()
     brand_df = brand_df[["id", "name"]]
@@ -79,11 +86,11 @@ def clean_product_dataframe(df:pd.DataFrame, base) -> pd.DataFrame:
 def export_to_excel(outputs: dict, export_file_name: str):
     """https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_excel.html"""
     writer = pd.ExcelWriter(f"{export_file_name}.xlsx")
-    if 'table_of_contents' in list(outputs):
-        df = outputs['table_of_contents']
-        df.to_excel(writer, sheet_name='table_of_contents')
-        outputs.pop('table_of_contents')
-    
+    if "table_of_contents" in list(outputs):
+        df = outputs["table_of_contents"]
+        df.to_excel(writer, sheet_name="table_of_contents")
+        outputs.pop("table_of_contents")
+
     for table in outputs:
         df = outputs[table]
         df.to_excel(writer, sheet_name=table)
@@ -137,7 +144,7 @@ def generate_pivot_report(df: pd.DataFrame, report_id: str = "testing", **config
     tmp.columns = ["sum"]
     outputs["sum_by_column"] = tmp
 
-    outputs["raw_data"] = df
+    # outputs["raw_data"] = df
 
     #
     attributes = {}

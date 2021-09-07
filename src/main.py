@@ -23,10 +23,9 @@ import numpy as np
 import pandas as pd
 
 import utils.general as utils
-import reports.orders_reports as report_configs
+import reports.pivot_report_configs as report_configs
 from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
-
 
 
 def get_orders_data() -> pd.DataFrame:
@@ -45,7 +44,7 @@ def get_orders_data() -> pd.DataFrame:
 def get_product_data() -> pd.DataFrame:
     base = BigCommProductsAPI()
     df = base.get_all()
-    df = utils.clean_product_dataframe(df)
+    df = utils.clean_product_dataframe(df, base)
     return df
 
 
@@ -67,24 +66,34 @@ def generate_sales_by_category_report(df: pd.DataFrame) -> str:
     return status
 
 
+def generate_inventory_valuation_report(df: pd.DataFrame) -> str:
+    # generate reports
+    configs = report_configs.inventory_valuation_report_configs()
+    report, attributes = utils.generate_pivot_report(df=df, **configs)
+    # export
+    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
+    return status
+
+
 def main():
     df = get_product_data()
     # backup products
     data_table = "product_catalog"
     utils.backup_dataframe(df, data_table)
     # product reports
-    # generate_inventory_valuation_report(df)
+    status = generate_inventory_valuation_report(df)
+    print(status)
 
-    df = get_orders_data()
-    # backup orders
-    data_table = "orders"
-    utils.backup_dataframe(df, data_table)
-    # orders reports
-    status = generate_sales_tax_report(df)
-    print(status)
-    status = generate_sales_by_category_report(df)
-    print(status)
-    # generate_collection_report(df,'gmdis')
+    # df = get_orders_data()
+    # # backup orders
+    # data_table = "orders"
+    # utils.backup_dataframe(df, data_table)
+    # # orders reports
+    # status = generate_sales_tax_report(df)
+    # print(status)
+    # status = generate_sales_by_category_report(df)
+    # print(status)
+    # # generate_collection_report(df,'gmdis')
     return status
 
 
