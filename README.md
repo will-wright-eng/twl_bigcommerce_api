@@ -1,9 +1,25 @@
 # TWL Reports
 Programatically extracting data from BigCommerce for custom reports
 
+## Table of Contents
+- [Reports Summary](#reports-summary)
+- [Notes](#notes)
+- [Repo Tree](#repo-tree)
+- [TODO](#todo)
+
+## Reports Summary
+### (1) MONTHLY REPORT OF SALES FOR SALES TAX PURPOSES BY PAYMENT METHOD
+- using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
+
+### (2) MONTHLY REPORTS FOR INVENTORY VALUATION
+- using [BigCommerce Catalog/Products v3 API](https://developer.bigcommerce.com/api-reference/store-management/catalog/products/getproducts) in BigCommProductsAPI class
+
+### (3) NEED A MONTHLY SALES REPORT BY CATEGORY or BY ITEM.
+- using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
+
 Reports Breakout
 [data source | report | data view / pivot table]
-![reports_lineage](./reports_lineage.png)
+![reports_lineage](.images/reports_lineage.png)
 
 ## Notes
 ```
@@ -24,19 +40,31 @@ TODO:
 
 ```
 
-## Tree
-
+## Repo Tree
 ```bash
 % tree --filelimit 9
 .
 ├── LICENSE
 ├── README.md
-├── notes
-├── reports_lineage.png
+├── images
+│   └── reports_lineage.png
+├── requirements.txt
 └── src
-    ├── Untitled.ipynb
-    ├── bc_api_orders.py
-    ├── bc_api_product.py
+    ├── __init__.py
+    ├── configs.yml
     ├── main.py
-    └── project.cfg
+    ├── modules
+    │   ├── __init__.py
+    │   └── bigcomm_api.py
+    ├── reports
+    │   ├── __init__.py
+    │   ├── orders_reports.py
+    │   └── product_reports.py
+    └── utils
+        └── general.py
 ```
+
+## TODO
+- reports 2 & 3
+- email module
+- abstract out report parameters

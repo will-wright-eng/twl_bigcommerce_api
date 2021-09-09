@@ -2,13 +2,14 @@ archive/
 notes/
 
 # files
-*configs.py
+*configs.yml
 Untitled.*
 project.cfg
 .DS_Store
 
 # file extensions
 *.csv
+*.xlsx
 
 # folders
 batches/
