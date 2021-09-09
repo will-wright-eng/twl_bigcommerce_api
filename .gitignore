@@ -2,7 +2,6 @@ archive/
 notes/
 
 # files
-*configs.py
 *configs.yml
 Untitled.*
 project.cfg
