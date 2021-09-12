@@ -27,10 +27,12 @@ import reports.pivot_report_configs as report_configs
 from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
+ANCHOR_DATE = "2021-01-01"
+
 
 def get_orders_data() -> pd.DataFrame:
     base = BigCommOrdersAPI()
-    tmp = base.get_all()
+    tmp = base.get_all(min_date_modified=ANCHOR_DATE)
 
     dfs = []
     for ind, data in tmp.items():
@@ -51,7 +53,7 @@ def get_product_data() -> pd.DataFrame:
 def generate_sales_tax_report(df: pd.DataFrame) -> str:
     # generate reports
     configs = report_configs.sales_tax_report_configs()
-    report, attributes = utils.generate_pivot_report(df=df, **configs)
+    report, attributes = utils.generate_report(df=df, **configs)
     # export
     status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
     return status
@@ -60,7 +62,7 @@ def generate_sales_tax_report(df: pd.DataFrame) -> str:
 def generate_sales_by_category_report(df: pd.DataFrame) -> str:
     # generate reports
     configs = report_configs.sales_by_category_report_configs()
-    report, attributes = utils.generate_pivot_report(df=df, **configs)
+    report, attributes = utils.generate_report(df=df, **configs)
     # export
     status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
     return status
@@ -69,7 +71,7 @@ def generate_sales_by_category_report(df: pd.DataFrame) -> str:
 def generate_inventory_valuation_report(df: pd.DataFrame) -> str:
     # generate reports
     configs = report_configs.inventory_valuation_report_configs()
-    report, attributes = utils.generate_pivot_report(df=df, **configs)
+    report, attributes = utils.generate_report(df=df, **configs)
     # export
     df.drop(["description"], axis=1, inplace=True)
     status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
@@ -82,19 +84,21 @@ def main():
     data_table = "product_catalog"
     utils.backup_dataframe(df, data_table)
     # product reports
-    status = generate_inventory_valuation_report(df)
-    print("generate_inventory_valuation_report ->", status)
+    product_reports = [generate_inventory_valuation_report]
+    for fxn in product_reports:
+        status = fxn(df)
+        print(f"{fxn.__name__} ->", status)
 
     df = get_orders_data()
     # backup orders
     data_table = "orders"
     utils.backup_dataframe(df, data_table)
     # orders reports
-    status = generate_sales_tax_report(df)
-    print("generate_sales_tax_report ->", status)
-    status = generate_sales_by_category_report(df)
-    print("generate_sales_by_category_report ->", status)
-    # generate_collection_report(df,'gmdis')
+    orders_reports = [generate_sales_tax_report, generate_sales_by_category_report]  # generate_collection_report
+    for fxn in product_reports:
+        status = fxn(df)
+        print(f"{fxn.__name__} ->", status)
+
     return status
 
 

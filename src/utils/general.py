@@ -37,8 +37,9 @@ def remove_low_count_cols(df):
 def convert_datetime_cols(df: pd.DataFrame) -> pd.DataFrame:
     # datetime date cols
     for date_col in [i for i in list(df) if "date" in i]:
-        df[date_col + "_date"] = pd.to_datetime(df[date_col])
-        df[date_col + "_date"] = df[date_col + "_date"].apply(lambda x: str(x).split(" ")[0])
+        df[date_col] = pd.to_datetime(df[date_col])
+        df[date_col] = df[date_col].dt.tz_localize(None)
+        df[date_col + "_date"] = df[date_col].apply(lambda x: str(x).split(" ")[0])
         df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
     return df
 
@@ -80,6 +81,12 @@ def clean_product_dataframe(df: pd.DataFrame, base) -> pd.DataFrame:
     df["category_all"] = ["/".join(i["url"].split("/")[:-2]) for i in list(df.custom_url)]
     df["category_top"] = df.category_all.apply(lambda x: top_level_category(x))
 
+    float_cols = ["price", "cost_price", "inventory_level"]
+    for col in float_cols:
+        df[col] = df[col].astype(float)
+    df["inventory_value"] = df["price"] * df["inventory_level"]
+    df["inventory_value_by_cost"] = df["cost_price"] * df["inventory_level"]
+
     return convert_datetime_cols(df)
 
 
@@ -101,7 +108,7 @@ def export_to_excel(outputs: dict, export_file_name: str):
     return f"export to {export_file_name}.xlsx complete"
 
 
-def generate_pivot_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> tuple:
+def generate_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> tuple:
 
     REPORT_TITLE = configs.get("report_title")
     input_dict = configs.get("input_dict")
@@ -123,33 +130,37 @@ def generate_pivot_report(df: pd.DataFrame, report_id: str = "testing", **config
     }
     report["tables"] = {}  # {'table1': pd.DataFrame, 'table2': pd.DataFrame, ...}
 
-    ## generate report
+    ## generate report tables
     outputs = {}
     for table_name, inputs in input_dict.items():
-        table = pd.pivot_table(
-            df,
-            values=inputs["values"],
-            index=inputs["index"],
-            columns=inputs["columns"],
-            aggfunc=np.sum,
-        )
-        table.columns = [j for i, j in list(table.columns)]
-        outputs[table_name] = table
 
-    ## suppliemental tables -- based on last input table
-    #
-    tmp = pd.DataFrame(table.sum(axis=1))
-    tmp.columns = ["sum"]
-    outputs["sum_by_row"] = tmp
+        if inputs["type"] == "date_filter":
+            df = df.loc[inputs["bool_op"](df[inputs["column"]], inputs["date"])]
 
-    #
-    tmp = pd.DataFrame(table.sum(axis=0))
-    tmp.columns = ["sum"]
-    outputs["sum_by_column"] = tmp
+        elif inputs["type"] == "pivot_table":
+            table = pd.pivot_table(
+                df,
+                values=inputs["values"],
+                index=inputs["index"],
+                columns=inputs["columns"],
+                aggfunc=np.sum,
+            )
+            table.columns = [j for i, j in list(table.columns)]
+            outputs[table_name] = table
+
+        elif inputs["type"] == "groupby_table":
+            headers = {i: inputs["aggfuncs"] for i in inputs["values"]}
+            table = df.groupby(inputs["index"]).agg(headers)
+            # table.reset_index(inplace=True, drop=False)
+            outputs[table_name] = table
+
+        elif inputs["type"] == "sum_on_previous_table":
+            tmp = pd.DataFrame(table.sum(axis=inputs["axis"]))
+            tmp.columns = ["sum"]
+            outputs[table_name] = tmp
 
     outputs["raw_data"] = df
 
-    #
     attributes = {}
     attributes["report_title"] = REPORT_TITLE
     tmp = {"table " + str(i): j for i, j in zip(range(len(list(outputs))), list(outputs))}
