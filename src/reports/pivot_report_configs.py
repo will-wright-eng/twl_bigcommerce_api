@@ -80,6 +80,8 @@ def sales_tax_report_configs() -> dict:
 def sales_by_category_report_configs() -> dict:
     """
     report type: orders
+
+    DONT INCLUDE BRAND OR CATEGORY COLUMNS
     """
     REPORT_TITLE = "ORDERS SUBTOTAL EX TAX BY CATEGORY AND BRAND"
     file_name = REPORT_TITLE.lower().replace(" ", "_")
@@ -89,7 +91,7 @@ def sales_by_category_report_configs() -> dict:
     inputs = {}
     inputs["type"] = "pivot_table"
     inputs["values"] = ["subtotal_ex_tax"]
-    inputs["index"] = ["date_created_month", "brand_name"]
+    inputs["index"] = ["date_created_month"]
     inputs["columns"] = ["category_top"]
     input_dict["ytd_pivot_by_brand_and_categories"] = inputs
 
@@ -111,15 +113,15 @@ def sales_by_category_report_configs() -> dict:
     inputs["type"] = "pivot_table"
     inputs["values"] = ["subtotal_ex_tax"]
     inputs["index"] = ["date_created_month", "date_created_date"]
-    inputs["columns"] = ["brand_name"]
+    inputs["columns"] = ["category_top"]
     input_dict["pivot_by_brand_and_date"] = inputs
 
     inputs = {}
     inputs["type"] = "pivot_table"
     inputs["values"] = ["subtotal_ex_tax"]
     inputs["index"] = ["category_top", "category_all"]
-    inputs["columns"] = ["brand_name"]
-    input_dict["pivot_by_brand_and_categories"] = inputs
+    inputs["columns"] = ["date_created_month"]
+    input_dict["pivot_by_categories"] = inputs
 
     inputs = {}
     inputs["type"] = "sum_on_previous_table"
