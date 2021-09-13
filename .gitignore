@@ -1,5 +1,6 @@
 archive/
 notes/
+src/xlsx_docs/
 
 # files
 *configs.yml

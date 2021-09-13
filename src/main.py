@@ -1,17 +1,9 @@
 """main.py docstring
 
-reports_list = ['inventory valuation','collections report','sales tax report']
-main(): run reports list
-
-Version 1:
-- product and orders classes will pull information from api
-- apply_filters method --> output: list of dataframes
-- write_to_excel method
-
 TODO:
 - email reports
 - add filter attributes to api calls
-- github actions for autoformatting via black -l 120 src/
+- github actions for autoformatting black -l 120 src/
 
 API json response schema
 https://jsonapi.org/
@@ -23,35 +15,50 @@ import numpy as np
 import pandas as pd
 
 import utils.general as utils
-import reports.pivot_report_configs as report_configs
+import utils.dataframes as dfutils
+import reports.report_configs as report_configs
 from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
+ANCHOR_DATE = "2021-01-01"
 
+
+## PRODUCTS ##
+def get_product_data() -> pd.DataFrame:
+    base = BigCommProductsAPI()
+    df = base.get_all()
+    df = dfutils.clean_product_dataframe(df, base)
+    return df
+
+
+def generate_inventory_valuation_report(df: pd.DataFrame) -> str:
+    # generate reports
+    configs = report_configs.inventory_valuation_report_configs()
+    report, attributes = dfutils.generate_report(df=df, **configs)
+    # export
+    df.drop(["description"], axis=1, inplace=True)
+    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
+    return status
+
+
+## ORDERS ##
 def get_orders_data() -> pd.DataFrame:
     base = BigCommOrdersAPI()
-    tmp = base.get_all()
+    tmp = base.get_all(min_date_modified=ANCHOR_DATE)
 
     dfs = []
     for ind, data in tmp.items():
         dfs.append(pd.DataFrame(data))
 
     df = pd.concat(dfs, axis=0)
-    df = utils.clean_order_dataframe(df)
-    return df
-
-
-def get_product_data() -> pd.DataFrame:
-    base = BigCommProductsAPI()
-    df = base.get_all()
-    df = utils.clean_product_dataframe(df, base)
-    return df
+    df = dfutils.clean_order_dataframe(df)
+    return df, base
 
 
 def generate_sales_tax_report(df: pd.DataFrame) -> str:
     # generate reports
     configs = report_configs.sales_tax_report_configs()
-    report, attributes = utils.generate_pivot_report(df=df, **configs)
+    report, attributes = dfutils.generate_report(df=df, **configs)
     # export
     status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
     return status
@@ -60,18 +67,27 @@ def generate_sales_tax_report(df: pd.DataFrame) -> str:
 def generate_sales_by_category_report(df: pd.DataFrame) -> str:
     # generate reports
     configs = report_configs.sales_by_category_report_configs()
-    report, attributes = utils.generate_pivot_report(df=df, **configs)
+    report, attributes = dfutils.generate_report(df=df, **configs)
     # export
     status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
     return status
 
 
-def generate_inventory_valuation_report(df: pd.DataFrame) -> str:
+def generate_collections_report(df: pd.DataFrame, base) -> str:
+    # get product details for each order
+    tmp_df = base.create_order_lines_dataframe(df)
+
+    # filter for collections
+    collections = ["GMDIS", "GSC", "CPC", "KBC", "BRC"]
+    tmp_df = tmp_df.loc[tmp_df.sku.str.contains("|".join(collections), case=False)]
+
+    # merge in order details
+    df = tmp_df.merge(df, how="left", left_on="order_id", right_on="id")
+
     # generate reports
-    configs = report_configs.inventory_valuation_report_configs()
-    report, attributes = utils.generate_pivot_report(df=df, **configs)
+    configs = report_configs.collections_report_configs(collections)
+    report, attributes = dfutils.generate_report(df=df, **configs)
     # export
-    df.drop(["description"], axis=1, inplace=True)
     status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
     return status
 
@@ -82,19 +98,24 @@ def main():
     data_table = "product_catalog"
     utils.backup_dataframe(df, data_table)
     # product reports
-    status = generate_inventory_valuation_report(df)
-    print("generate_inventory_valuation_report ->", status)
+    product_reports = [generate_inventory_valuation_report]
+    for fxn in product_reports:
+        status = fxn(df)
+        print(f"{fxn.__name__} ->", status)
 
-    df = get_orders_data()
+    df, base = get_orders_data()
     # backup orders
     data_table = "orders"
     utils.backup_dataframe(df, data_table)
     # orders reports
-    status = generate_sales_tax_report(df)
-    print("generate_sales_tax_report ->", status)
-    status = generate_sales_by_category_report(df)
-    print("generate_sales_by_category_report ->", status)
-    # generate_collection_report(df,'gmdis')
+    orders_reports = [generate_sales_tax_report]  # , generate_sales_by_category_report]
+    for fxn in orders_reports:
+        status = fxn(df)
+        print(f"{fxn.__name__} ->", status)
+
+    status = generate_collections_report(df, base)
+    print(f"{generate_collections_report.__name__} ->", status)
+
     return status
 
 
