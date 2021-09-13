@@ -2,6 +2,7 @@
 
 import os
 import yaml
+
 import shutil
 import configparser
 import datetime as dt
@@ -37,7 +38,7 @@ def remove_low_count_cols(df):
 def convert_datetime_cols(df: pd.DataFrame) -> pd.DataFrame:
     # datetime date cols
     for date_col in [i for i in list(df) if "date" in i]:
-        df[date_col] = pd.to_datetime(df[date_col])
+        df.loc[:, date_col] = pd.to_datetime(df[date_col])
         df[date_col] = df[date_col].dt.tz_localize(None)
         df[date_col + "_date"] = df[date_col].apply(lambda x: str(x).split(" ")[0])
         df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
@@ -59,6 +60,8 @@ def clean_order_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     for col in dollar_cols:
         df[col] = df[col].astype(float)
 
+    # filter for only completed or shipped orders
+    df = df.loc[df.status.apply(lambda x: (x == "Shipped") or (x == "Completed"))]
     return convert_datetime_cols(df)
 
 
@@ -132,10 +135,16 @@ def generate_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> 
 
     ## generate report tables
     outputs = {}
+    raw_df = df
+    print("generating report")
     for table_name, inputs in input_dict.items():
+        print(inputs["type"], f"len df:{str(len(df))}")
 
-        if inputs["type"] == "date_filter":
-            df = df.loc[inputs["bool_op"](df[inputs["column"]], inputs["date"])]
+        if inputs["type"] == "data_filter":
+            df = df.loc[inputs["bool_op"](df[inputs["column"]], inputs["bool_arg"])]
+
+        if inputs["type"] == "data_reset":
+            df = raw_df
 
         elif inputs["type"] == "pivot_table":
             table = pd.pivot_table(
@@ -146,20 +155,21 @@ def generate_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> 
                 aggfunc=np.sum,
             )
             table.columns = [j for i, j in list(table.columns)]
-            outputs[table_name] = table
+            if len(table) > 0:
+                outputs[table_name] = table
 
         elif inputs["type"] == "groupby_table":
             headers = {i: inputs["aggfuncs"] for i in inputs["values"]}
             table = df.groupby(inputs["index"]).agg(headers)
-            # table.reset_index(inplace=True, drop=False)
-            outputs[table_name] = table
+            if len(table) > 0:
+                outputs[table_name] = table
 
         elif inputs["type"] == "sum_on_previous_table":
-            tmp = pd.DataFrame(table.sum(axis=inputs["axis"]))
-            tmp.columns = ["sum"]
-            outputs[table_name] = tmp
+            table = pd.DataFrame(table.sum(axis=inputs["axis"]))
+            table.columns = ["sum"]
+            outputs[table_name] = table
 
-    outputs["raw_data"] = df
+    outputs["raw_data"] = raw_df
 
     attributes = {}
     attributes["report_title"] = REPORT_TITLE

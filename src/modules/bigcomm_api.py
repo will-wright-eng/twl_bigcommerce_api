@@ -2,6 +2,7 @@
 
 import yaml
 import json
+import time
 import logging
 import inspect
 import http.client
@@ -35,11 +36,12 @@ class BigCommOrdersAPI(object):
         try:
             json_data = json.loads(res.decode("utf-8"))
         except JSONDecodeError as e:
-            print("error:" + e)
+            print(e)
         return json_data
 
     def get_all(self, min_date_modified: str = "2021-08-01") -> dict:
         """very descriptive docstring"""
+        print("get all orders")
         data = {}
         flag = True
         page_num = 0
@@ -50,18 +52,35 @@ class BigCommOrdersAPI(object):
         )
         while flag:
             page_num += 1
+            print(f"page_num:{page_num}")
             self.conn.request("GET", url.format(page_num), headers=self.headers)
 
             res = self.conn.getresponse().read()
             try:
                 json_data = json.loads(res.decode("utf-8"))
             except JSONDecodeError as e:
-                print("error:" + e)
+                print(e)
                 return json_data, flag, res
             data[page_num] = json_data
             if page_num > 1 and len(json_data) < 250:
                 flag = False
         return data
+
+    def create_order_lines_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        tic = time.perf_counter()
+
+        tmp = []
+        order_ids = list(df["id"])
+        print("getting product details... this takes a while")
+        for order in order_ids:
+            tmp.append(self.get_product_details(order))
+
+        toc = time.perf_counter()
+        print(f"Completed in {toc - tic:0.4f} seconds")
+
+        df = pd.DataFrame([item for sublist in tmp for item in sublist])
+        df["sku_prefix"] = df.sku.apply(lambda ele: ele.split("-")[0])
+        return df
 
 
 class BigCommProductsAPI(object):
@@ -93,7 +112,7 @@ class BigCommProductsAPI(object):
 
     def get_all(self) -> pd.DataFrame:
         """very descriptive docstring"""
-        # self.logger.info("get all products in catalog")
+        print("get all products")
         data = {}
         flag = True
         page_num = 0
@@ -124,11 +143,9 @@ class BigCommProductsAPI(object):
             print('pages dictionary unable to convert to dataframe, call "data" attribute')
         return df
 
-
-
     def get_brands(self) -> pd.DataFrame:
         """very descriptive docstring"""
-        # self.logger.info("get all products in catalog")
+        print("get brands")
         data = {}
         flag = True
         page_num = 0
@@ -147,10 +164,7 @@ class BigCommProductsAPI(object):
             data[page_num] = json_data
             if page_num % 10 == 0:
                 print(
-                    "retrieving page "
-                    + str(json_data["meta"]["pagination"]["current_page"])
-                    + " of "
-                    + str(json_data["meta"]["pagination"]["total_pages"])
+                    f'retrieving page {str(json_data["meta"]["pagination"]["current_page"])} of {str(json_data["meta"]["pagination"]["total_pages"])}'
                 )
             if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
                 flag = False
@@ -161,17 +175,3 @@ class BigCommProductsAPI(object):
             pass
             print('pages dictionary unable to convert to dataframe, call "data" attribute')
         return df
-
-
-
-
-
-
-
-
-
-
-
-
-
-

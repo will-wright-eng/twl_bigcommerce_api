@@ -12,14 +12,17 @@
 """
 
 
+from typing import List
+
 import datetime as dt
 from operator import lt, gt, eq
 
 
+TODAY = str(dt.datetime.today()).split(" ")[0]
 REPORT_START_DATE = "2021-08-01"
 
 
-def sales_tax_report_configs():
+def sales_tax_report_configs() -> dict:
     """
     report type: orders
     """
@@ -36,8 +39,8 @@ def sales_tax_report_configs():
     input_dict["ytd_pivot_by_month"] = inputs
 
     inputs = {}
-    inputs["type"] = "date_filter"
-    inputs["date"] = REPORT_START_DATE
+    inputs["type"] = "data_filter"
+    inputs["bool_arg"] = REPORT_START_DATE
     inputs["column"] = "date_created"
     inputs["bool_op"] = gt
     input_dict["table_modification"] = inputs
@@ -66,18 +69,15 @@ def sales_tax_report_configs():
     inputs["axis"] = 0
     input_dict["sum_by_column"] = inputs
 
-    TODAY = str(dt.datetime.today()).split(" ")[0]
     configs = {}
     configs["report_title"] = REPORT_TITLE
     configs["export_file_name"] = f"{TODAY}_{file_name}_post_aug01"
     configs["input_dict"] = input_dict
 
-    # df_filter = {}
-    # df_filter['col']
     return configs
 
 
-def sales_by_category_report_configs():
+def sales_by_category_report_configs() -> dict:
     """
     report type: orders
     """
@@ -101,8 +101,8 @@ def sales_by_category_report_configs():
     input_dict["ytd_pivot_by_categories"] = inputs
 
     inputs = {}
-    inputs["type"] = "date_filter"
-    inputs["date"] = REPORT_START_DATE
+    inputs["type"] = "data_filter"
+    inputs["bool_arg"] = REPORT_START_DATE
     inputs["column"] = "date_created"
     inputs["bool_op"] = gt
     input_dict["table_modification"] = inputs
@@ -131,19 +131,21 @@ def sales_by_category_report_configs():
     inputs["axis"] = 0
     input_dict["sum_by_column"] = inputs
 
-    TODAY = str(dt.datetime.today()).split(" ")[0]
+    # TODAY = str(dt.datetime.today()).split(" ")[0]
     configs = {}
     configs["report_title"] = REPORT_TITLE
     configs["export_file_name"] = f"{TODAY}_{file_name}_post_aug01"
     configs["input_dict"] = input_dict
+
     return configs
 
 
-def inventory_valuation_report_configs():
+def inventory_valuation_report_configs() -> dict:
     """
     report type: product
     """
     REPORT_TITLE = "INVENTORY VALUATION REPORT"
+    file_name = REPORT_TITLE.lower().replace(" ", "_")
 
     input_dict = {}
 
@@ -192,9 +194,53 @@ def inventory_valuation_report_configs():
     inputs["axis"] = 0
     input_dict["sum_by_column"] = inputs
 
-    TODAY = str(dt.datetime.today()).split(" ")[0]
+    # TODAY = str(dt.datetime.today()).split(" ")[0]
     configs = {}
     configs["report_title"] = REPORT_TITLE
-    configs["export_file_name"] = f"{TODAY}_inventory_valuation"
+    configs["export_file_name"] = f"{TODAY}_{file_name}"
     configs["input_dict"] = input_dict
+
+    return configs
+
+
+def collections_report_configs(collections: List[str]) -> dict:
+    """
+    report type: orders
+    """
+    REPORT_TITLE = "COLLECTIONS MONTHLY REPORT"
+    file_name = REPORT_TITLE.lower().replace(" ", "_")
+
+    input_dict = {}
+
+    inputs = {}
+    inputs["type"] = "pivot_table"
+    inputs["values"] = ["subtotal_ex_tax"]
+    inputs["index"] = ["date_created_month"]
+    inputs["columns"] = ["sku_prefix"]
+    input_dict["ytd_pivot_by_month"] = inputs
+
+    for sku_prefix in collections:
+        inputs = {}
+        inputs["type"] = "data_filter"
+        inputs["bool_arg"] = sku_prefix
+        inputs["column"] = "sku_prefix"
+        inputs["bool_op"] = eq
+        input_dict[f"data_filter_{sku_prefix.lower()}"] = inputs
+
+        inputs = {}
+        inputs["type"] = "pivot_table"
+        inputs["values"] = ["subtotal_ex_tax"]
+        inputs["index"] = ["sku_prefix", "sku"]
+        inputs["columns"] = ["date_created_month"]
+        input_dict[f"pivot_by_month_{sku_prefix.lower()}"] = inputs
+
+        inputs = {}
+        inputs["type"] = "data_reset"
+        input_dict[f"data_reset_{sku_prefix.lower()}"] = inputs
+
+    configs = {}
+    configs["report_title"] = REPORT_TITLE
+    configs["export_file_name"] = f"{TODAY}_{file_name}"
+    configs["input_dict"] = input_dict
+
     return configs
