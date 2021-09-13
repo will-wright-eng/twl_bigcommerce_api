@@ -61,7 +61,7 @@ def clean_product_dataframe(df: pd.DataFrame, base) -> pd.DataFrame:
     brand_df = base.get_brands()
     brand_df = brand_df[["id", "name"]]
     brand_df.columns = ["brand_id", "brand_name"]
-    backup_dataframe(df, 'brands')
+    backup_dataframe(df, "brands")
     df = df.merge(brand_df, how="left", on="brand_id")
 
     # category from custom url
@@ -136,7 +136,7 @@ def generate_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> 
             outputs[table_name] = table
 
         else:
-            print('invalid input type')
+            print("invalid input type")
 
     outputs["raw_data"] = raw_df
 

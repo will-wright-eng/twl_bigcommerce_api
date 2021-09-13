@@ -16,7 +16,7 @@ import pandas as pd
 
 import utils.general as utils
 import utils.dataframes as dfutils
-import reports.pivot_report_configs as report_configs
+import reports.report_configs as report_configs
 from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
@@ -108,7 +108,7 @@ def main():
     data_table = "orders"
     utils.backup_dataframe(df, data_table)
     # orders reports
-    orders_reports = [generate_sales_tax_report]#, generate_sales_by_category_report]
+    orders_reports = [generate_sales_tax_report]  # , generate_sales_by_category_report]
     for fxn in orders_reports:
         status = fxn(df)
         print(f"{fxn.__name__} ->", status)
