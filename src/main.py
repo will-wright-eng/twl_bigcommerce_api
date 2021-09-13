@@ -27,7 +27,7 @@ import reports.pivot_report_configs as report_configs
 from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
-ANCHOR_DATE = "2021-09-01"
+ANCHOR_DATE = "2021-05-01"
 
 
 ## PRODUCTS ##

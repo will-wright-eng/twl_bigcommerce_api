@@ -39,7 +39,7 @@ def convert_datetime_cols(df: pd.DataFrame) -> pd.DataFrame:
     # datetime date cols
     for date_col in [i for i in list(df) if "date" in i]:
         df.loc[:, date_col] = pd.to_datetime(df[date_col])
-        df[date_col] = df[date_col].dt.tz_localize(None)
+        df.loc[:, date_col] = df[date_col].dt.tz_localize(None)
         df[date_col + "_date"] = df[date_col].apply(lambda x: str(x).split(" ")[0])
         df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
     return df
@@ -143,7 +143,7 @@ def generate_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> 
         if inputs["type"] == "data_filter":
             df = df.loc[inputs["bool_op"](df[inputs["column"]], inputs["bool_arg"])]
 
-        if inputs["type"] == "data_reset":
+        elif inputs["type"] == "data_reset":
             df = raw_df
 
         elif inputs["type"] == "pivot_table":
@@ -168,6 +168,9 @@ def generate_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> 
             table = pd.DataFrame(table.sum(axis=inputs["axis"]))
             table.columns = ["sum"]
             outputs[table_name] = table
+
+        else:
+            print('invalid input type')
 
     outputs["raw_data"] = raw_df
 
