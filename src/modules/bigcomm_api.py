@@ -42,7 +42,7 @@ class BigCommOrdersAPI(object):
     def get_all(self, min_date_modified: str = "2021-08-01") -> dict:
         """very descriptive docstring"""
         msg = "get all orders"
-        print(6 * "#", "\n", msg, "\n", 6 * "#")
+        print(" ", 6 * "#", "\n", msg, "\n", 6 * "#")
         data = {}
         flag = True
         page_num = 0
@@ -76,7 +76,7 @@ class BigCommOrdersAPI(object):
         print("getting product details... this takes a while")
         order_num = 1
         for order in order_ids:
-            if order_num % 10 == 0:
+            if order_num % 100 == 0:
                 print(f"retrieving order: {order_num} of {len(order_ids)}")
             tmp.append(self.get_product_details(order))
             order_num += 1
@@ -88,6 +88,9 @@ class BigCommOrdersAPI(object):
         df["sku_prefix"] = df.sku.apply(lambda ele: ele.split("-")[0])
         df.loc[:, "price_ex_tax"] = df.loc[:, "price_ex_tax"].astype(float)
         return df
+
+    def close_conn(self):
+        return self.conn.close()
 
 
 class BigCommProductsAPI(object):
@@ -120,7 +123,7 @@ class BigCommProductsAPI(object):
     def get_all(self) -> pd.DataFrame:
         """very descriptive docstring"""
         msg = "get all products"
-        print(6 * "#", "\n", msg, "\n", 6 * "#")
+        print(" ", 6 * "#", "\n", msg, "\n", 6 * "#")
         data = {}
         flag = True
         page_num = 0
@@ -154,7 +157,7 @@ class BigCommProductsAPI(object):
     def get_brands(self) -> pd.DataFrame:
         """very descriptive docstring"""
         msg = "get all brands"
-        print(6 * "#", "\n", msg, "\n", 6 * "#")
+        print(" ", 6 * "#", "\n", msg, "\n", 6 * "#")
         data = {}
         flag = True
         page_num = 0
@@ -184,3 +187,6 @@ class BigCommProductsAPI(object):
             pass
             print('pages dictionary unable to convert to dataframe, call "data" attribute')
         return df
+
+    def close_conn(self):
+        return self.conn.close()
