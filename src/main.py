@@ -44,7 +44,7 @@ def get_orders_data() -> pd.DataFrame:
 
     df = pd.concat(dfs, axis=0)
     df = dfutils.clean_order_dataframe(df)
-    df = df.loc[df.date_created>ANCHOR_DATE]
+    df = df.loc[df.date_created > ANCHOR_DATE]
     return df, base
 
 

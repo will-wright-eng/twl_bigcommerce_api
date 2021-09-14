@@ -1,6 +1,6 @@
-"""report logic docstring
-
-contains top level logic for generating reports
+"""
+report logic docstring
+- contains top level logic for generating reports
 """
 
 
@@ -52,7 +52,7 @@ def generate_collections_report(df: pd.DataFrame, base) -> str:
 
     # merge in order details
     df = tmp_df.merge(df, how="left", left_on="order_id", right_on="id")
-    utils.backup_dataframe(df, 'order_lines')
+    utils.backup_dataframe(df, "order_lines")
 
     # generate reports
     configs = report_configs.collections_report_configs(collections)
