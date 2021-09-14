@@ -52,7 +52,8 @@ class BigCommOrdersAPI(object):
         )
         while flag:
             page_num += 1
-            print(f"page_num:{page_num}")
+            if page_num % 10 == 0:
+                print(f"retrieving page: {page_num}")
             self.conn.request("GET", url.format(page_num), headers=self.headers)
 
             res = self.conn.getresponse().read()
@@ -131,7 +132,7 @@ class BigCommProductsAPI(object):
             data[page_num] = json_data
             if page_num % 10 == 0:
                 print(
-                    f'retrieving page {str(json_data["meta"]["pagination"]["current_page"])} of {str(json_data["meta"]["pagination"]["total_pages"])}'
+                    f'retrieving page: {str(json_data["meta"]["pagination"]["current_page"])} of {str(json_data["meta"]["pagination"]["total_pages"])}'
                 )
             if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
                 flag = False
@@ -164,7 +165,7 @@ class BigCommProductsAPI(object):
             data[page_num] = json_data
             if page_num % 10 == 0:
                 print(
-                    f'retrieving page {str(json_data["meta"]["pagination"]["current_page"])} of {str(json_data["meta"]["pagination"]["total_pages"])}'
+                    f'retrieving page: {str(json_data["meta"]["pagination"]["current_page"])} of {str(json_data["meta"]["pagination"]["total_pages"])}'
                 )
             if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
                 flag = False
