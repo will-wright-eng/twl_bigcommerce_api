@@ -239,7 +239,7 @@ def collections_report_configs(collections: List[str]) -> dict:
         inputs = {}
         inputs["type"] = "groupby_table"
         inputs["values"] = ["price_ex_tax"]
-        inputs["index"] = ["date_created_month","sku_prefix", "sku"]
+        inputs["index"] = ["date_created_month", "sku_prefix", "sku"]
         inputs["aggfuncs"] = ["sum", "count"]
         input_dict[f"groupby_month_{sku_prefix.lower()}"] = inputs
 

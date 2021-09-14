@@ -41,7 +41,8 @@ class BigCommOrdersAPI(object):
 
     def get_all(self, min_date_modified: str = "2021-08-01") -> dict:
         """very descriptive docstring"""
-        print("get all orders")
+        msg = "get all orders"
+        print(6 * "#", "\n", msg, "\n", 6 * "#")
         data = {}
         flag = True
         page_num = 0
@@ -73,14 +74,19 @@ class BigCommOrdersAPI(object):
         tmp = []
         order_ids = list(df["id"])
         print("getting product details... this takes a while")
+        order_num = 1
         for order in order_ids:
+            if order_num % 10 == 0:
+                print(f"retrieving order: {order_num} of {len(order_ids)}")
             tmp.append(self.get_product_details(order))
+            order_num += 1
 
         toc = time.perf_counter()
         print(f"Completed in {toc - tic:0.4f} seconds")
 
         df = pd.DataFrame([item for sublist in tmp for item in sublist])
         df["sku_prefix"] = df.sku.apply(lambda ele: ele.split("-")[0])
+        df.loc[:, "price_ex_tax"] = df.loc[:, "price_ex_tax"].astype(float)
         return df
 
 
@@ -113,7 +119,8 @@ class BigCommProductsAPI(object):
 
     def get_all(self) -> pd.DataFrame:
         """very descriptive docstring"""
-        print("get all products")
+        msg = "get all products"
+        print(6 * "#", "\n", msg, "\n", 6 * "#")
         data = {}
         flag = True
         page_num = 0
@@ -146,7 +153,8 @@ class BigCommProductsAPI(object):
 
     def get_brands(self) -> pd.DataFrame:
         """very descriptive docstring"""
-        print("get brands")
+        msg = "get all brands"
+        print(6 * "#", "\n", msg, "\n", 6 * "#")
         data = {}
         flag = True
         page_num = 0
