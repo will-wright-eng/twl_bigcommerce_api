@@ -1,13 +1,15 @@
 """main.py docstring
 
 TODO:
+- fix sales by category report! bring category and/or brand into orders
+
 - email reports
 - add filter attributes to api calls
 - github actions for autoformatting black -l 120 src/
+- automate to run on monthly basis
 
 API json response schema
 https://jsonapi.org/
-
 """
 
 
@@ -16,11 +18,11 @@ import pandas as pd
 
 import utils.general as utils
 import utils.dataframes as dfutils
-import reports.report_configs as report_configs
+import reports.report_logic as reports
 from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
-ANCHOR_DATE = "2021-01-01"
+ANCHOR_DATE = "2021-09-01"
 
 
 ## PRODUCTS ##
@@ -29,16 +31,6 @@ def get_product_data() -> pd.DataFrame:
     df = base.get_all()
     df = dfutils.clean_product_dataframe(df, base)
     return df
-
-
-def generate_inventory_valuation_report(df: pd.DataFrame) -> str:
-    # generate reports
-    configs = report_configs.inventory_valuation_report_configs()
-    report, attributes = dfutils.generate_report(df=df, **configs)
-    # export
-    df.drop(["description"], axis=1, inplace=True)
-    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
-    return status
 
 
 ## ORDERS ##
@@ -52,44 +44,8 @@ def get_orders_data() -> pd.DataFrame:
 
     df = pd.concat(dfs, axis=0)
     df = dfutils.clean_order_dataframe(df)
+    df = df.loc[df.date_created>ANCHOR_DATE]
     return df, base
-
-
-def generate_sales_tax_report(df: pd.DataFrame) -> str:
-    # generate reports
-    configs = report_configs.sales_tax_report_configs()
-    report, attributes = dfutils.generate_report(df=df, **configs)
-    # export
-    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
-    return status
-
-
-def generate_sales_by_category_report(df: pd.DataFrame) -> str:
-    # generate reports
-    configs = report_configs.sales_by_category_report_configs()
-    report, attributes = dfutils.generate_report(df=df, **configs)
-    # export
-    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
-    return status
-
-
-def generate_collections_report(df: pd.DataFrame, base) -> str:
-    # get product details for each order
-    tmp_df = base.create_order_lines_dataframe(df)
-
-    # filter for collections
-    collections = ["GMDIS", "GSC", "CPC", "KBC", "BRC"]
-    tmp_df = tmp_df.loc[tmp_df.sku.str.contains("|".join(collections), case=False)]
-
-    # merge in order details
-    df = tmp_df.merge(df, how="left", left_on="order_id", right_on="id")
-
-    # generate reports
-    configs = report_configs.collections_report_configs(collections)
-    report, attributes = dfutils.generate_report(df=df, **configs)
-    # export
-    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
-    return status
 
 
 def main():
@@ -98,23 +54,23 @@ def main():
     data_table = "product_catalog"
     utils.backup_dataframe(df, data_table)
     # product reports
-    product_reports = [generate_inventory_valuation_report]
+    product_reports = [reports.generate_inventory_valuation_report]
     for fxn in product_reports:
         status = fxn(df)
-        print(f"{fxn.__name__} ->", status)
+        print(f"{fxn.__name__} -> {status}")
 
     df, base = get_orders_data()
     # backup orders
     data_table = "orders"
     utils.backup_dataframe(df, data_table)
     # orders reports
-    orders_reports = [generate_sales_tax_report]  # , generate_sales_by_category_report]
+    orders_reports = [reports.generate_sales_tax_report]  # , generate_sales_by_category_report]
     for fxn in orders_reports:
         status = fxn(df)
-        print(f"{fxn.__name__} ->", status)
+        print(f"{fxn.__name__} -> {status}")
 
-    status = generate_collections_report(df, base)
-    print(f"{generate_collections_report.__name__} ->", status)
+    status = reports.generate_collections_report(df, base)
+    print(f"{reports.generate_collections_report.__name__} -> {status}")
 
     return status
 

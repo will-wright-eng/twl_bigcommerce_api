@@ -131,9 +131,9 @@ def generate_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> 
                 outputs[table_name] = table
 
         elif inputs["type"] == "sum_on_previous_table":
-            table = pd.DataFrame(table.sum(axis=inputs["axis"]))
-            table.columns = ["sum"]
-            outputs[table_name] = table
+            tmp = pd.DataFrame(table.sum(axis=inputs["axis"]))
+            tmp.columns = ["sum"]
+            outputs[table_name] = tmp
 
         else:
             print("invalid input type")
