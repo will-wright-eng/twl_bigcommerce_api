@@ -22,7 +22,7 @@ import reports.report_logic as reports
 from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
-ANCHOR_DATE = "2021-09-01"
+ANCHOR_DATE = "2021-01-01"
 
 
 ## PRODUCTS ##
