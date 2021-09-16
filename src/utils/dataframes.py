@@ -21,10 +21,12 @@ def remove_low_count_cols(df):
 def convert_datetime_cols(df: pd.DataFrame) -> pd.DataFrame:
     # datetime date cols
     for date_col in [i for i in list(df) if "date" in i]:
-        df.loc[:, date_col] = pd.to_datetime(df[date_col])
-        df.loc[:, date_col] = df[date_col].dt.tz_localize(None)
-        df[date_col + "_date"] = df[date_col].apply(lambda x: str(x).split(" ")[0])
-        df[date_col + "_month"] = df[date_col + "_date"].apply(lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1]))
+        df.loc[:, date_col] = pd.to_datetime(df.loc[:, date_col])
+        df.loc[:, date_col] = df.loc[:, date_col].dt.tz_localize(None)
+        df.loc[:, date_col + "_date"] = df.loc[:, date_col].apply(lambda x: str(x).split(" ")[0])
+        df.loc[:, date_col + "_month"] = df.loc[:, date_col + "_date"].apply(
+            lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1])
+        )
     return df
 
 

@@ -25,7 +25,6 @@ from modules.bigcomm_api import BigCommProductsAPI
 ANCHOR_DATE = "2021-01-01"
 
 
-## PRODUCTS ##
 def get_product_data() -> pd.DataFrame:
     base = BigCommProductsAPI()
     df = base.get_all()
@@ -33,7 +32,6 @@ def get_product_data() -> pd.DataFrame:
     return df, base
 
 
-## ORDERS ##
 def get_orders_data() -> pd.DataFrame:
     base = BigCommOrdersAPI()
     tmp = base.get_all(min_date_modified=ANCHOR_DATE)
@@ -51,51 +49,26 @@ def get_orders_data() -> pd.DataFrame:
 def main():
 
     df, base = get_product_data()
-    # backup products
     data_table = "product_catalog"
     utils.backup_dataframe(df, data_table)
-    # product reports
     product_reports = [reports.generate_inventory_valuation_report]
     for fxn in product_reports:
         status = fxn(df)
         print(f"{fxn.__name__} -> {status}")
-
     base.close_conn()
 
     df, base = get_orders_data()
-    # backup orders
     data_table = "orders"
     utils.backup_dataframe(df, data_table)
-    # orders reports
     orders_reports = [reports.generate_sales_tax_report]  # , generate_sales_by_category_report]
     for fxn in orders_reports:
         status = fxn(df)
         print(f"{fxn.__name__} -> {status}")
-
     status = reports.generate_collections_report(df, base)
     print(f"{reports.generate_collections_report.__name__} -> {status}")
-
     base.close_conn()
 
-    # try:
-    #     df, base = get_orders_data()
-    #     # backup orders
-    #     data_table = "orders"
-    #     utils.backup_dataframe(df, data_table)
-    #     # orders reports
-    #     orders_reports = [reports.generate_sales_tax_report]  # , generate_sales_by_category_report]
-    #     for fxn in orders_reports:
-    #         status = fxn(df)
-    #         print(f"{fxn.__name__} -> {status}")
-
-    #     status = reports.generate_collections_report(df, base)
-    #     print(f"{reports.generate_collections_report.__name__} -> {status}")
-    # except Exception as e:
-    #     print(e)
-    # finally:
-    #     base.close_conn()
-
-    # return status
+    return status
 
 
 if __name__ == "__main__":

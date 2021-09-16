@@ -10,6 +10,7 @@ import pandas as pd
 import utils.general as utils
 import utils.dataframes as dfutils
 import reports.report_configs as report_configs
+from modules.bigcomm_api import BigCommOrdersAPI
 
 
 ## PRODUCTS ##
@@ -42,7 +43,7 @@ def generate_sales_by_category_report(df: pd.DataFrame) -> str:
     return status
 
 
-def generate_collections_report(df: pd.DataFrame, base) -> str:
+def generate_collections_report(df: pd.DataFrame, base: BigCommOrdersAPI) -> str:
     # get product details for each order
     tmp_df = base.create_order_lines_dataframe(df)
 
