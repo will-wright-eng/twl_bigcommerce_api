@@ -229,12 +229,19 @@ def collections_report_configs(collections: List[str]) -> dict:
         inputs["bool_op"] = eq
         input_dict[f"data_filter_{sku_prefix.lower()}"] = inputs
 
+        # inputs = {}
+        # inputs["type"] = "pivot_table"
+        # inputs["values"] = ["price_ex_tax"]
+        # inputs["index"] = ["sku_prefix", "sku"]
+        # inputs["columns"] = ["date_created_month"]
+        # input_dict[f"pivot_by_month_{sku_prefix.lower()}"] = inputs
+
         inputs = {}
-        inputs["type"] = "pivot_table"
-        inputs["values"] = ["subtotal_ex_tax"]
-        inputs["index"] = ["sku_prefix", "sku"]
-        inputs["columns"] = ["date_created_month"]
-        input_dict[f"pivot_by_month_{sku_prefix.lower()}"] = inputs
+        inputs["type"] = "groupby_table"
+        inputs["values"] = ["price_ex_tax"]
+        inputs["index"] = ["date_created_month", "sku_prefix", "sku"]
+        inputs["aggfuncs"] = ["sum", "count"]
+        input_dict[f"groupby_month_{sku_prefix.lower()}"] = inputs
 
         inputs = {}
         inputs["type"] = "data_reset"
