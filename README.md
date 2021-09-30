@@ -70,10 +70,10 @@ TODO:
 ```
 
 ## TODO
-- reports 2 & 3
 - email module
 - abstract out report parameters
 - add concurrency/multithreading/asyncio
     - https://www.integralist.co.uk/posts/python-asyncio/
     - https://pymotw.com/3/concurrency.html
     - [pluralsight course](https://www.pluralsight.com/courses/python-concurrency-getting-started?aid=701j0000001heIoAAI&promo=&utm_source=non_branded&utm_medium=digital_paid_search_google&utm_campaign=US_Dynamic&utm_content=&cq_cmp=175953558&gclid=CjwKCAjwndCKBhAkEiwAgSDKQWeoq-az9nEmDHwyaBrCNq-_myyUTN2WnF2rNdP5OhL8hCMMO4SXQRoC4j0QAvD_BwE#)
+- allow reports to be run on backup file (modify get_data arguement "source" to default to api, but S3 file can be specified)
