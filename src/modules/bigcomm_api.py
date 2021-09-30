@@ -87,6 +87,7 @@ class BigCommOrdersAPI(object):
             if flag:
                 return flag
             else:
+                print(f"errored out at order num: {order_num}")
                 print(e)
                 return self.get_product_details_recursive(self.order_ids[order_num:])
 

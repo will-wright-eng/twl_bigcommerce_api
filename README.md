@@ -7,6 +7,11 @@ Programatically extracting data from BigCommerce for custom reports
 - [Repo Tree](#repo-tree)
 - [TODO](#todo)
 
+## Usage Notes
+- `conda create -n twl python=3.8`
+- `conda activate twl`
+- `pip install -r requirements.txt`
+
 ## Reports Summary
 ### (1) MONTHLY REPORT OF SALES FOR SALES TAX PURPOSES BY PAYMENT METHOD
 - using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
@@ -68,3 +73,7 @@ TODO:
 - reports 2 & 3
 - email module
 - abstract out report parameters
+- add concurrency/multithreading/asyncio
+    - https://www.integralist.co.uk/posts/python-asyncio/
+    - https://pymotw.com/3/concurrency.html
+    - [pluralsight course](https://www.pluralsight.com/courses/python-concurrency-getting-started?aid=701j0000001heIoAAI&promo=&utm_source=non_branded&utm_medium=digital_paid_search_google&utm_campaign=US_Dynamic&utm_content=&cq_cmp=175953558&gclid=CjwKCAjwndCKBhAkEiwAgSDKQWeoq-az9nEmDHwyaBrCNq-_myyUTN2WnF2rNdP5OhL8hCMMO4SXQRoC4j0QAvD_BwE#)
