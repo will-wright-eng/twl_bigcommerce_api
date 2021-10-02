@@ -72,6 +72,7 @@ class BigCommOrdersAPI(object):
     def get_product_details_loop(self, order_ids: List[str]):
         flag = False
         for order, order_num in zip(order_ids, range(len(order_ids))):
+            self.save_order_num = order_num
             if order_num % 1000 == 0:
                 print(f"retrieving order: {order_num} of {len(order_ids)}")
             self.tmp_data.append(self.get_product_details(order))
@@ -87,9 +88,10 @@ class BigCommOrdersAPI(object):
             if flag:
                 return flag
             else:
-                print(f"errored out at order num: {order_num}")
+                print(f"errored out at order num: {self.save_order_num}")
                 print(e)
-                return self.get_product_details_recursive(self.order_ids[order_num:])
+                self.total_order_num = self.save_order_num + self.total_order_num
+                return self.get_product_details_recursive(self.order_ids[self.total_order_num:])
 
     def create_order_lines_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         tic = time.perf_counter()
@@ -98,6 +100,7 @@ class BigCommOrdersAPI(object):
         self.order_ids = list(df["id"])
         print("getting product details... this takes a while")
 
+        self.total_order_num = 0
         flag = self.get_product_details_recursive(self.order_ids)
 
         toc = time.perf_counter()

@@ -30,7 +30,7 @@ def load_config_file(config_part: str) -> dict:
 
 def export_to_excel(outputs: dict, export_file_name: str):
     """https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_excel.html"""
-    TODAY = str(dt.datetime.today()).split(" ")[0]
+    TODAY = str(dt.datetime.today()).split('.')[0].replace(' ','_').replace(':','')
     file_path = os.path.join("xlsx_docs", TODAY)
     os.makedirs(file_path, exist_ok=True)
     writer = pd.ExcelWriter(f"{file_path}/{export_file_name}.xlsx")

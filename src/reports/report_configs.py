@@ -19,7 +19,7 @@ from operator import lt, gt, eq
 
 
 TODAY = str(dt.datetime.today()).split(" ")[0]
-REPORT_START_DATE = "2021-08-01"
+REPORT_START_DATE = "2021-09-01"
 
 
 def sales_tax_report_configs() -> dict:

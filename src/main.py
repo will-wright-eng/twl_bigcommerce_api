@@ -23,6 +23,7 @@ from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
 ANCHOR_DATE = "2021-01-01"
+# REPORT_START_DATE = "2021-09-01"
 
 
 def get_product_data() -> pd.DataFrame:
