@@ -78,3 +78,7 @@ TODO:
     - [pluralsight course](https://www.pluralsight.com/courses/python-concurrency-getting-started?aid=701j0000001heIoAAI&promo=&utm_source=non_branded&utm_medium=digital_paid_search_google&utm_campaign=US_Dynamic&utm_content=&cq_cmp=175953558&gclid=CjwKCAjwndCKBhAkEiwAgSDKQWeoq-az9nEmDHwyaBrCNq-_myyUTN2WnF2rNdP5OhL8hCMMO4SXQRoC4j0QAvD_BwE#)
 - allow reports to be run on backup file (modify get_data arguement "source" to default to api, but S3 file can be specified)
 - summarize buisness logic for the product api, orders api, and each report
+- create record of each run and write to db with prameters like run_success, date_parameters, associated_s3_files, program_version, etc
+- write reports to s3
+- symantic version repo
+- deploy program as execute form in web app!!
