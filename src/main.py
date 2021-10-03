@@ -23,13 +23,13 @@ from modules.bigcomm_api import BigCommOrdersAPI
 from modules.bigcomm_api import BigCommProductsAPI
 
 ANCHOR_DATE = "2021-01-01"
-# REPORT_START_DATE = "2021-09-01"
+# REPORT_START_DATE = "2021-09-01" --> see report_configs.py
 
 
 def get_product_data() -> pd.DataFrame:
     base = BigCommProductsAPI()
     df = base.get_all()
-    df = dfutils.clean_product_dataframe(df, base)
+    df = dfutils.clean_product_dataframe(df=df, base=base)
     return df, base
 
 
@@ -42,7 +42,7 @@ def get_orders_data() -> pd.DataFrame:
         dfs.append(pd.DataFrame(data))
 
     df = pd.concat(dfs, axis=0)
-    df = dfutils.clean_order_dataframe(df)
+    df = dfutils.clean_order_dataframe(df=df)
     df = df.loc[df.date_created > ANCHOR_DATE]
     return df, base
 
@@ -51,7 +51,7 @@ def main():
 
     df, base = get_product_data()
     data_table = "product_catalog"
-    utils.backup_dataframe(df, data_table)
+    utils.backup_dataframe(df=df, data_table=data_table)
     product_reports = [reports.generate_inventory_valuation_report]
     for fxn in product_reports:
         status = fxn(df)
@@ -60,14 +60,14 @@ def main():
 
     df, base = get_orders_data()
     data_table = "orders"
-    utils.backup_dataframe(df, data_table)
+    utils.backup_dataframe(df=df, data_table=data_table)
     orders_reports = [
         reports.generate_sales_tax_report
     ]  # , generate_sales_by_category_report]
     for fxn in orders_reports:
         status = fxn(df)
         print(f"{fxn.__name__} -> {status}")
-    status = reports.generate_collections_report(df, base)
+    status = reports.generate_collections_report(df=df, base=base)
     print(f"{reports.generate_collections_report.__name__} -> {status}")
     base.close_conn()
 
@@ -76,7 +76,7 @@ def main():
     utils.upload_to_s3_v2(
         local_path=zip_file,
         bucket_name=os.getenv("S3_BUCKET"),
-        object_name=zip_file.replace(".zip", "_report.zip"),
+        object_name=zip_file.replace(".zip", "_reports.zip"),
     )
 
 

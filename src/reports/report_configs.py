@@ -1,17 +1,3 @@
-"""
-## (1) MONTHLY REPORT OF SALES FOR SALES TAX PURPOSES BY PAYMENT METHOD
-- using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
-
-
-## (2) MONTHLY REPORTS FOR INVENTORY VALUATION
-- using [BigCommerce Catalog/Products v3 API](https://developer.bigcommerce.com/api-reference/store-management/catalog/products/getproducts) in BigCommProductsAPI class
-
-
-## (3) NEED A MONTHLY SALES REPORT BY CATEGORY AND BY ITEM.
-- using [BigCommerce Orders v2 API](https://developer.bigcommerce.com/api-reference/store-management/orders/orders/getallorders) in BigCommOrdersAPI class
-"""
-
-
 from typing import List
 
 import datetime as dt
@@ -53,11 +39,18 @@ def sales_tax_report_configs() -> dict:
     inputs["columns"] = ["payment_method"]
     input_dict[f"pivot_by_day_post_{MONTH}"] = inputs
 
+    # inputs = {}
+    # inputs["type"] = "pivot_table"
+    # inputs["values"] = ["subtotal_ex_tax"]
+    # inputs["index"] = ["date_created_month", "date_created_date"]
+    # inputs["columns"] = ["base_shipping_cost"]
+    # input_dict[f"pivot_shipping_by_day_post_{MONTH}"] = inputs
+
     inputs = {}
-    inputs["type"] = "pivot_table"
-    inputs["values"] = ["subtotal_ex_tax"]
+    inputs["type"] = "groupby_table"
+    inputs["values"] = ["base_shipping_cost"]
     inputs["index"] = ["date_created_month", "date_created_date"]
-    inputs["columns"] = ["base_shipping_cost"]
+    inputs["aggfuncs"] = ["sum", "count"]
     input_dict[f"pivot_shipping_by_day_post_{MONTH}"] = inputs
 
     inputs = {}
