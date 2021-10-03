@@ -1,15 +1,19 @@
 """general file for utils"""
 
 import os
-import yaml
-
 import shutil
-import configparser
-import datetime as dt
 
+# import configparser
+import datetime as dt
+from pathlib import Path
+
+import yaml
 import boto3
 import numpy as np
 import pandas as pd
+
+TODAY = str(dt.datetime.today()).split(" ")[0]
+REPORT_FILE_PATH = os.path.join("xlsx_docs", TODAY)
 
 
 def load_yml_configs(file_name: str) -> dict:
@@ -21,19 +25,17 @@ def load_yml_configs(file_name: str) -> dict:
     return configs
 
 
-def load_config_file(config_part: str) -> dict:
-    config = configparser.ConfigParser()
-    config.read("project.cfg")
-    configs = dict(config.items(config_part))
-    return configs
+# def load_config_file(config_part: str) -> dict:
+#     config = configparser.ConfigParser()
+#     config.read("project.cfg")
+#     configs = dict(config.items(config_part))
+#     return configs
 
 
 def export_to_excel(outputs: dict, export_file_name: str):
     """https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_excel.html"""
-    TODAY = str(dt.datetime.today()).split('.')[0].replace(' ','_').replace(':','')
-    file_path = os.path.join("xlsx_docs", TODAY)
-    os.makedirs(file_path, exist_ok=True)
-    writer = pd.ExcelWriter(f"{file_path}/{export_file_name}.xlsx")
+    os.makedirs(REPORT_FILE_PATH, exist_ok=True)
+    writer = pd.ExcelWriter(f"{REPORT_FILE_PATH}/{export_file_name}.xlsx")
     if "table_of_contents" in list(outputs):
         df = outputs["table_of_contents"]
         df.to_excel(writer, sheet_name="table_of_contents")
@@ -64,7 +66,7 @@ def backup_dataframe(df: pd.DataFrame, data_table: str):
     - exports to S3 bucket
     - deletes tmp directory
     """
-    S3_BUCKET = "twl-dev"
+    S3_BUCKET = os.getenv("S3_BUCKET")
     TODAY = str(dt.datetime.today()).split(" ")[0]
     file_name = f"{TODAY}_{data_table}.csv"
     folder = f"tmp_backup/backup_{data_table}"
@@ -74,7 +76,22 @@ def backup_dataframe(df: pd.DataFrame, data_table: str):
     try:
         os.makedirs(folder, exist_ok=True)
         df.to_csv(local_path)
-        resp = upload_to_s3_v2(local_path=local_path, bucket_name=S3_BUCKET, object_name=object_name)
+        resp = upload_to_s3_v2(
+            local_path=local_path, bucket_name=S3_BUCKET, object_name=object_name
+        )
     finally:
         shutil.rmtree("tmp_backup")
     return resp
+
+
+def clean_string(string: str) -> str:
+    string = "".join(e for e in string if e.isalnum() or e == " ")
+    string = string.replace("  ", " ").replace("  ", " ").replace(" ", "_")
+    return string
+
+
+def zip_process(file_or_dir: str) -> str:
+    cwd = str(Path.cwd())
+    zip_source = os.path.join(cwd, file_or_dir)
+    zip_target = os.path.join(cwd, clean_string(file_or_dir))
+    return shutil.make_archive(zip_target, "zip", zip_source)

@@ -23,7 +23,9 @@ def convert_datetime_cols(df: pd.DataFrame) -> pd.DataFrame:
     for date_col in [i for i in list(df) if "date" in i]:
         df.loc[:, date_col] = pd.to_datetime(df.loc[:, date_col])
         df.loc[:, date_col] = df.loc[:, date_col].dt.tz_localize(None)
-        df.loc[:, date_col + "_date"] = df.loc[:, date_col].apply(lambda x: str(x).split(" ")[0])
+        df.loc[:, date_col + "_date"] = df.loc[:, date_col].apply(
+            lambda x: str(x).split(" ")[0]
+        )
         df.loc[:, date_col + "_month"] = df.loc[:, date_col + "_date"].apply(
             lambda x: "-".join(str(x).split(" ")[0].split("-")[:-1])
         )
@@ -41,7 +43,9 @@ def clean_order_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     df.payment_method = df.payment_method.apply(lambda x: null_fill(x))
 
     # amount columns set to float
-    dollar_cols = [i for i in list(df) if "subtotal" in i] + [i for i in list(df) if "cost" in i]
+    dollar_cols = [i for i in list(df) if "subtotal" in i] + [
+        i for i in list(df) if "cost" in i
+    ]
     for col in dollar_cols:
         df[col] = df[col].astype(float)
 
@@ -67,7 +71,9 @@ def clean_product_dataframe(df: pd.DataFrame, base) -> pd.DataFrame:
     df = df.merge(brand_df, how="left", on="brand_id")
 
     # category from custom url
-    df["category_all"] = ["/".join(i["url"].split("/")[:-2]) for i in list(df.custom_url)]
+    df["category_all"] = [
+        "/".join(i["url"].split("/")[:-2]) for i in list(df.custom_url)
+    ]
     df["category_top"] = df.category_all.apply(lambda x: top_level_category(x))
 
     float_cols = ["price", "cost_price", "inventory_level"]
@@ -144,7 +150,9 @@ def generate_report(df: pd.DataFrame, report_id: str = "testing", **configs) -> 
 
     attributes = {}
     attributes["report_title"] = REPORT_TITLE
-    tmp = {"table " + str(i): j for i, j in zip(range(len(list(outputs))), list(outputs))}
+    tmp = {
+        "table " + str(i): j for i, j in zip(range(len(list(outputs))), list(outputs))
+    }
     attributes.update(tmp)
     tmp = pd.DataFrame(attributes.items())
     outputs["table_of_contents"] = tmp

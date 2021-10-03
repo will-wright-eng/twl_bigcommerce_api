@@ -61,7 +61,9 @@ def main():
     df, base = get_orders_data()
     data_table = "orders"
     utils.backup_dataframe(df, data_table)
-    orders_reports = [reports.generate_sales_tax_report]  # , generate_sales_by_category_report]
+    orders_reports = [
+        reports.generate_sales_tax_report
+    ]  # , generate_sales_by_category_report]
     for fxn in orders_reports:
         status = fxn(df)
         print(f"{fxn.__name__} -> {status}")
@@ -69,7 +71,13 @@ def main():
     print(f"{reports.generate_collections_report.__name__} -> {status}")
     base.close_conn()
 
-    return status
+    # zip reports folder and upload to s3
+    zip_file = zip_process(file_or_dir=utils.REPORT_FILE_PATH)
+    utils.upload_to_s3_v2(
+        local_path=zip_file,
+        bucket_name=os.getenv("S3_BUCKET"),
+        object_name=zip_file.replace(".zip", "_report.zip"),
+    )
 
 
 if __name__ == "__main__":

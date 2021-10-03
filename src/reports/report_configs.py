@@ -19,6 +19,7 @@ from operator import lt, gt, eq
 
 
 TODAY = str(dt.datetime.today()).split(" ")[0]
+MONTH = str(dt.datetime.today().strftime("%b")).lower()
 REPORT_START_DATE = "2021-09-01"
 
 
@@ -50,14 +51,21 @@ def sales_tax_report_configs() -> dict:
     inputs["values"] = ["subtotal_ex_tax"]
     inputs["index"] = ["date_created_month", "date_created_date"]
     inputs["columns"] = ["payment_method"]
-    input_dict["pivot_by_day_post_aug01"] = inputs
+    input_dict[f"pivot_by_day_post_{MONTH}"] = inputs
+
+    inputs = {}
+    inputs["type"] = "pivot_table"
+    inputs["values"] = ["subtotal_ex_tax"]
+    inputs["index"] = ["date_created_month", "date_created_date"]
+    inputs["columns"] = ["base_shipping_cost"]
+    input_dict[f"pivot_shipping_by_day_post_{MONTH}"] = inputs
 
     inputs = {}
     inputs["type"] = "pivot_table"
     inputs["values"] = ["subtotal_ex_tax", "subtotal_inc_tax", "subtotal_tax"]
     inputs["index"] = ["date_created_month"]
     inputs["columns"] = ["payment_method"]
-    input_dict["pivot_by_month_post_aug01"] = inputs
+    input_dict[f"pivot_by_month_post_{MONTH}"] = inputs
 
     inputs = {}
     inputs["type"] = "sum_on_previous_table"
@@ -71,7 +79,7 @@ def sales_tax_report_configs() -> dict:
 
     configs = {}
     configs["report_title"] = REPORT_TITLE
-    configs["export_file_name"] = f"{TODAY}_{file_name}_post_aug01"
+    configs["export_file_name"] = f"{TODAY}_{file_name}_post_{MONTH}"
     configs["input_dict"] = input_dict
 
     return configs
@@ -136,7 +144,7 @@ def sales_by_category_report_configs() -> dict:
     # TODAY = str(dt.datetime.today()).split(" ")[0]
     configs = {}
     configs["report_title"] = REPORT_TITLE
-    configs["export_file_name"] = f"{TODAY}_{file_name}_post_aug01"
+    configs["export_file_name"] = f"{TODAY}_{file_name}_post_{MONTH}"
     configs["input_dict"] = input_dict
 
     return configs
@@ -153,28 +161,65 @@ def inventory_valuation_report_configs() -> dict:
 
     inputs = {}
     inputs["type"] = "groupby_table"
-    inputs["values"] = ["price", "cost_price", "inventory_level", "inventory_value", "inventory_value_by_cost"]
+    inputs["values"] = [
+        "price",
+        "cost_price",
+        "inventory_level",
+        "inventory_value",
+        "inventory_value_by_cost",
+    ]
     inputs["index"] = ["category_top"]
     inputs["aggfuncs"] = ["sum", "mean"]
     input_dict["groupby_category"] = inputs
 
     inputs = {}
     inputs["type"] = "groupby_table"
-    inputs["values"] = ["price", "cost_price", "inventory_level", "inventory_value", "inventory_value_by_cost"]
+    inputs["values"] = [
+        "price",
+        "cost_price",
+        "inventory_level",
+        "inventory_value",
+        "inventory_value_by_cost",
+    ]
+    inputs["index"] = ["category_top"]
+    inputs["aggfuncs"] = "sum"
+    input_dict["groupby_category_sum"] = inputs
+
+    inputs = {}
+    inputs["type"] = "groupby_table"
+    inputs["values"] = [
+        "price",
+        "cost_price",
+        "inventory_level",
+        "inventory_value",
+        "inventory_value_by_cost",
+    ]
     inputs["index"] = ["category_top"]
     inputs["aggfuncs"] = ["sum", "mean", "median", "count"]
     input_dict["groupby_category"] = inputs
 
     inputs = {}
     inputs["type"] = "groupby_table"
-    inputs["values"] = ["price", "cost_price", "inventory_level", "inventory_value", "inventory_value_by_cost"]
+    inputs["values"] = [
+        "price",
+        "cost_price",
+        "inventory_level",
+        "inventory_value",
+        "inventory_value_by_cost",
+    ]
     inputs["index"] = ["brand_name"]
     inputs["aggfuncs"] = "sum"
     input_dict["groupby_brand"] = inputs
 
     inputs = {}
     inputs["type"] = "groupby_table"
-    inputs["values"] = ["price", "cost_price", "inventory_level", "inventory_value", "inventory_value_by_cost"]
+    inputs["values"] = [
+        "price",
+        "cost_price",
+        "inventory_level",
+        "inventory_value",
+        "inventory_value_by_cost",
+    ]
     inputs["index"] = ["brand_name", "category_top"]
     inputs["aggfuncs"] = "sum"
     input_dict["groupby_cat_and_brand"] = inputs
@@ -216,7 +261,7 @@ def collections_report_configs(collections: List[str]) -> dict:
 
     inputs = {}
     inputs["type"] = "pivot_table"
-    inputs["values"] = ["subtotal_ex_tax"]
+    inputs["values"] = ["price_ex_tax"]
     inputs["index"] = ["date_created_month"]
     inputs["columns"] = ["sku_prefix"]
     input_dict["ytd_pivot_by_month"] = inputs
@@ -239,7 +284,7 @@ def collections_report_configs(collections: List[str]) -> dict:
         inputs = {}
         inputs["type"] = "groupby_table"
         inputs["values"] = ["price_ex_tax"]
-        inputs["index"] = ["date_created_month", "sku_prefix", "sku"]
+        inputs["index"] = ["date_created_month", "sku_prefix", "sku", "order_id"]
         inputs["aggfuncs"] = ["sum", "count"]
         input_dict[f"groupby_month_{sku_prefix.lower()}"] = inputs
 

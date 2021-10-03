@@ -20,7 +20,10 @@ def generate_inventory_valuation_report(df: pd.DataFrame) -> str:
     report, attributes = dfutils.generate_report(df=df, **configs)
     # export
     df.drop(["description"], axis=1, inplace=True)
-    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
+    status = utils.export_to_excel(
+        outputs=report["tables"],
+        export_file_name=report["attributes"]["export_file_name"],
+    )
     return status
 
 
@@ -30,7 +33,10 @@ def generate_sales_tax_report(df: pd.DataFrame) -> str:
     configs = report_configs.sales_tax_report_configs()
     report, attributes = dfutils.generate_report(df=df, **configs)
     # export
-    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
+    status = utils.export_to_excel(
+        outputs=report["tables"],
+        export_file_name=report["attributes"]["export_file_name"],
+    )
     return status
 
 
@@ -39,7 +45,10 @@ def generate_sales_by_category_report(df: pd.DataFrame) -> str:
     configs = report_configs.sales_by_category_report_configs()
     report, attributes = dfutils.generate_report(df=df, **configs)
     # export
-    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
+    status = utils.export_to_excel(
+        outputs=report["tables"],
+        export_file_name=report["attributes"]["export_file_name"],
+    )
     return status
 
 
@@ -59,5 +68,8 @@ def generate_collections_report(df: pd.DataFrame, base: BigCommOrdersAPI) -> str
     configs = report_configs.collections_report_configs(collections)
     report, attributes = dfutils.generate_report(df=df, **configs)
     # export
-    status = utils.export_to_excel(outputs=report["tables"], export_file_name=report["attributes"]["export_file_name"])
+    status = utils.export_to_excel(
+        outputs=report["tables"],
+        export_file_name=report["attributes"]["export_file_name"],
+    )
     return status

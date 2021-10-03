@@ -60,7 +60,9 @@ class BigCommOrdersAPI(object):
         return data
 
     def get_product_details(self, order_id: str) -> dict:
-        url = f"https://api.bigcommerce.com/stores/yt68tfv9/v2/orders/{order_id}/products"
+        url = (
+            f"https://api.bigcommerce.com/stores/yt68tfv9/v2/orders/{order_id}/products"
+        )
         self.conn.request("GET", url, headers=self.headers)
         res = self.conn.getresponse().read()
         try:
@@ -91,7 +93,9 @@ class BigCommOrdersAPI(object):
                 print(f"errored out at order num: {self.save_order_num}")
                 print(e)
                 self.total_order_num = self.save_order_num + self.total_order_num
-                return self.get_product_details_recursive(self.order_ids[self.total_order_num:])
+                return self.get_product_details_recursive(
+                    self.order_ids[self.total_order_num :]
+                )
 
     def create_order_lines_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         tic = time.perf_counter()
@@ -166,14 +170,19 @@ class BigCommProductsAPI(object):
                 print(
                     f'retrieving page: {str(json_data["meta"]["pagination"]["current_page"])} of {str(json_data["meta"]["pagination"]["total_pages"])}'
                 )
-            if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
+            if (
+                json_data["meta"]["pagination"]["current_page"]
+                == json_data["meta"]["pagination"]["total_pages"]
+            ):
                 flag = False
 
         try:
             df = self.convert_pages_to_df(data)
         except:
             pass
-            print('pages dictionary unable to convert to dataframe, call "data" attribute')
+            print(
+                'pages dictionary unable to convert to dataframe, call "data" attribute'
+            )
         return df
 
     def get_brands(self) -> pd.DataFrame:
@@ -200,14 +209,19 @@ class BigCommProductsAPI(object):
                 print(
                     f'retrieving page: {str(json_data["meta"]["pagination"]["current_page"])} of {str(json_data["meta"]["pagination"]["total_pages"])}'
                 )
-            if json_data["meta"]["pagination"]["current_page"] == json_data["meta"]["pagination"]["total_pages"]:
+            if (
+                json_data["meta"]["pagination"]["current_page"]
+                == json_data["meta"]["pagination"]["total_pages"]
+            ):
                 flag = False
 
         try:
             df = self.convert_pages_to_df(data)
         except:
             pass
-            print('pages dictionary unable to convert to dataframe, call "data" attribute')
+            print(
+                'pages dictionary unable to convert to dataframe, call "data" attribute'
+            )
         return df
 
     def close_conn(self):
