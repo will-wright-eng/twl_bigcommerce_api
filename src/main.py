@@ -12,7 +12,6 @@ API json response schema
 https://jsonapi.org/
 """
 
-
 import numpy as np
 import pandas as pd
 
@@ -72,12 +71,14 @@ def main():
     base.close_conn()
 
     # zip reports folder and upload to s3
-    zip_file = zip_process(file_or_dir=utils.REPORT_FILE_PATH)
-    utils.upload_to_s3_v2(
+    zip_file = utils.zip_process(file_or_dir=utils.REPORT_FILE_PATH)
+    print(zip_file)
+    object_name = f"xlsxdocs/{zip_file.split('/')[-1].replace('.zip', '_reports.zip')}"
+    resp = utils.upload_to_s3_v2(
         local_path=zip_file,
-        bucket_name=os.getenv("S3_BUCKET"),
-        object_name=zip_file.replace(".zip", "_reports.zip"),
+        object_name=object_name,
     )
+    print(resp)
 
 
 if __name__ == "__main__":

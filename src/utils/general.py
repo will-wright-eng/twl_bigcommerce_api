@@ -48,12 +48,13 @@ def export_to_excel(outputs: dict, export_file_name: str):
     return f"export to {export_file_name}.xlsx complete"
 
 
-def upload_to_s3_v2(local_path: str, bucket_name: str, object_name: str):
+def upload_to_s3_v2(local_path: str, object_name: str, bucket_name: str =  os.getenv("S3_BUCKET")):
     """
     path_output: local dir file path
     bucket_name: name of s3 bucket
     key_path: key path + file name = object name
     """
+    print(local_path, bucket_name, object_name)
     s3 = boto3.client("s3")
     response = s3.upload_file(local_path, bucket_name, object_name)
     return response
@@ -85,7 +86,7 @@ def backup_dataframe(df: pd.DataFrame, data_table: str):
 
 
 def clean_string(string: str) -> str:
-    string = "".join(e for e in string if e.isalnum() or e == " ")
+    string = "".join(e for e in string if e.isalnum() or e == " " or e=='/')
     string = string.replace("  ", " ").replace("  ", " ").replace(" ", "_")
     return string
 
