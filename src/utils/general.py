@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 TODAY = str(dt.datetime.today()).split(" ")[0]
-REPORT_FILE_PATH = os.path.join("xlsx_docs", TODAY)
+REPORT_FILE_PATH = os.path.join("xlsxdocs", TODAY)
 
 
 def load_yml_configs(file_name: str) -> dict:
